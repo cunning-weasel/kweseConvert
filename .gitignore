@@ -1,0 +1,6 @@
+config.json
+.env
+
+output_weasel_server
+weasel_server.x86_64
+weasel_server.x86
