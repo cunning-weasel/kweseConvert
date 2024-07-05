@@ -52,11 +52,6 @@ const renderData = async () => {
         "BWP", "GBP", "EUR",
         "NAD", "ZiG", "AUD",
         "ZAR", "MZN", "AED",
-    ];
-    const currenciesDropdown = [
-        "BWP", "GBP", "EUR",
-        "NAD", "ZiG", "AUD",
-        "ZAR", "MZN", "AED",
         "USD"
     ];
     // const ratesCountry = Object.keys(data.conversion_rates);
@@ -70,17 +65,7 @@ const renderData = async () => {
             return data.conversion_rates[currency];
         }
     });
-    // console.log("rates:", rates, "currencies:", currencies);
-
-
-    const dropdownRates = currenciesDropdown.map(currency => {
-        if (currency !== "ZiG") {
-            return data.conversion_rates[convertedCurrency];
-        }
-    });
-    console.log("dropdownRates:", dropdownRates, "currencies:", currencies);
-    // const dropdownRates = data.conversion_rates[convertedCurrency];
-
+    console.log("rates:", rates, "currencies:", currencies);
 
     new Chart(ctx, {
         type: "bar",
@@ -145,10 +130,8 @@ const renderData = async () => {
 
 const convertCurrency = () => {
     const amount = document.getElementById("amount").value;
-    // currency picker thing
+    // To-Do: currency picker
     const convertedCurrency = document.getElementById("convertedCurrency").value;
-
-    // const dropdownRates = data.conversion_rates[convertedCurrency];
 
     const converted = amount * zigToUsdRate;
     document.getElementById("converted").value = converted.toFixed(2);

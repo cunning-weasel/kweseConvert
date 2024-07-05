@@ -1,7 +1,7 @@
 "use strict";
 
 let db;
-let cacheName = "weasel_cache-v1";
+let cacheName = "weasel_cache-v2";
 
 const cacheAssets = async (assets) => {
     const cache = await caches.open(cacheName);
@@ -9,8 +9,13 @@ const cacheAssets = async (assets) => {
 };
 
 const putInCache = async (request, response) => {
-    const cache = await caches.open(cacheName);
-    await cache.put(request, response);
+    try {
+        const cache = await caches.open(cacheName);
+        await cache.put(request, response);
+    }
+    catch (err) {
+        console.error(err);
+    }
 };
 
 const enableNavPreload = async () => {
@@ -43,6 +48,7 @@ const assetHandler = async (request, preloadResponsePromise) => {
 
     try {
         const networkRes = await fetch(request);
+        // To-Do: same-domain ? cache reqs : return networkRes 
         putInCache(request, networkRes.clone());
         return networkRes;
     } catch (error) {
