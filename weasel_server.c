@@ -119,7 +119,7 @@ void read_file(Arena *arena, int newsockfd, char *uri)
     char filepath[PATH_MAX];
     snprintf(filepath, sizeof(filepath), "index%s", uri);
 
-    printf("Attempting to open file: %s\n", filepath); 
+    printf("Attempting to open file: %s\n", filepath);
 
     FILE *fp = fopen(filepath, "rb");
     if (fp)
@@ -153,6 +153,18 @@ void read_file(Arena *arena, int newsockfd, char *uri)
         else if (strstr(uri, ".json"))
         {
             content_type = "application/json";
+        }
+        else if (strstr(uri, ".png"))
+        {
+            content_type = "image/png";
+        }
+        else if (strstr(uri, ".css"))
+        {
+            content_type = "text/css";
+        }
+        else if (strstr(uri, ".svg"))
+        {
+            content_type = "image/svg+xml";
         }
 
         send_full_res(newsockfd, buffer, content_type, file_size);
