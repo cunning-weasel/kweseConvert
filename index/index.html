@@ -31,34 +31,53 @@
           <path d="M15 18a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
         </svg> Kwese
       </a>
-      <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target='#currencyModal'>
-        Country
-      </button>
+      <!-- <select id="convertedCurrency" class="btn btn-outline-warning border-0 p-0">
+        <option value="USD">🇺🇸 USD</option>
+        <option value="ZAR">🇿🇦 ZAR</option>
+        <option value="GBP">🇬🇧 GBP</option>
+        <option value="BWP">🇧🇼 BWP</option>
+        <option value="EUR">🇪🇺 EUR</option>
+        <option value="NAD">🇳🇦 NAD</option>
+        <option value="MZN">🇲🇿 MZN</option>
+      </select> -->
     </div>
   </nav>
-  <div class="container mt-5">
+  <div class="container mt-4">
     <div class="card">
       <div class="card-body">
         <div class="form-group">
           <h3>Kwese Converter</h3>
           <p>Convert Zimbabwe ZiG to USD</p>
-          <!-- inputs should be side by side always and take inputs 2 ways 
-          and just have a clear button -->
-          <label for="amount">🇿🇼 ZiG</label> <!-- hardcoded val -->
-          <input type="number" id="amount" class="form-control" placeholder="0">
-        </div>
-        <div class="form-group">
-          <label for="converted">USD</label> <!-- make dynamic choice -->
-          <input type="text" id="converted" class="form-control" readonly placeholder="0">
-          <div class="d-grid gap-2">
-            <button class="btn btn-outline-light my-3" id="convertButton">Convert</button>
+          <!-- inputs should take inputs 2 ways and just have a clear button -->
+          <div class="form-group row">
+            <div class="col">
+              <label for="amount">🇿🇼 ZiG</label> <!-- hardcoded val -->
+              <input type="number" id="amount" class="form-control" placeholder="0">
+            </div>
+            <!-- <div class="form-group"> -->
+            <div class="col">
+              <!-- <label for="converted"></label> -->
+              <select id="convertedCurrency" class="form-select border border-0 p-0">
+                <option value="USD">🇺🇸 USD</option>
+                <option value="ZAR">🇿🇦 ZAR</option>
+                <option value="GBP">🇬🇧 GBP</option>
+                <option value="BWP">🇧🇼 BWP</option>
+                <option value="EUR">🇪🇺 EUR</option>
+                <option value="NAD">🇳🇦 NAD</option>
+                <option value="MZN">🇲🇿 MZN</option>
+              </select>
+              <input type="text" id="converted" class="form-control" readonly placeholder="0">
+            </div>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-light my-3" id="convertButton">Convert</button>
+            </div>
           </div>
           <!-- mini card -->
           <div class="card text-bg-dark mb-1">
             <div class="card-body d-flex align-items-center">
               <i class="ti ti-currency-yen fs-2 me-3"></i>
               <div>
-                <div>1 Ziggy Marley = 0.0057 USD</div>
+                <div>1 Ziggy Marley = 0.0727 USD</div>
                 <small class="text-muted">Updated Fri 05 Jul 2024, 7:36:28 AM</small>
               </div>
             </div>
@@ -68,32 +87,6 @@
     </div>
     <div class="mt-3">
       <canvas id="myChart"></canvas>
-    </div>
-    <!-- Modal -->
-    <div class="modal fade" id="currencyModal" tabindex="-1" aria-labelledby="currencyModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-light">
-          <div class="modal-header border-bottom-0">
-            <h5 class="modal-title" id="currencyModalLabel">Convert to currency</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <!-- Search field -->
-            <input type="search" class="form-control mb-3" placeholder="Search for currency ...">
-            <!-- Currency list -->
-            <ul class="list-group">
-              <!-- List items for each currency -->
-              <!-- Repeat this list item structure for each currency option needed -->
-              <li class='list-group-item bg-secondary text-light'>
-                <!-- Country flag and currency code here -->
-                <!-- Example: Australian Dollar -->
-                <img src='path_to_australian_flag' alt='Australian Flag' /> AUD
-              </li>
-              <!-- ... other currencies ... -->
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
 
 

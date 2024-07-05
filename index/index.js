@@ -1,7 +1,8 @@
 "use strict";
 // https://zimpricecheck.com/price-updates/official-and-black-market-exchange-rates/
 
-// service worker
+const zigToUsdRate = 0.0727; // hardcoded rate for ZiG to USD - scrap later?
+
 const registerServiceWorker = async () => {
     if ("serviceWorker" in navigator) {
         try {
@@ -21,22 +22,14 @@ const registerServiceWorker = async () => {
     }
 };
 
-const zigToUsdRate = 0.0727; // hardcoded rate for ZiG to USD - zimpricecheck
-
-const convertCurrency = () => {
-    const amount = document.getElementById("amount").value;
-    const converted = amount * zigToUsdRate;
-    document.getElementById("converted").value = converted.toFixed(4);
-};
-
-const callAPis = async () => {
+const fetchData = async () => {
     try {
         const apiUrl = `https://v6.exchangerate-api.com/v6/8a8edde2a4ac1fc683a3698f/latest/USD`;
-
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
             throw new Error("Failed to fetch data from echangeRate API");
         }
+
         const data = await apiResponse.json();
         // console.log("data:", data);
         return data;
@@ -46,21 +39,29 @@ const callAPis = async () => {
     }
 };
 
-const renderChart = async () => {
+const renderData = async () => {
     const ctx = document.getElementById("myChart");
-    const data = await callAPis();
+    const data = await fetchData();
 
     if (!data) {
         console.error("No data available to render chart.");
         return;
     }
 
-    const currencies = ["GBP", "EUR", "NAD", "MZN", "ZiG"];
+    const currencies = [
+        "BWP", "GBP", "EUR",
+        "NAD", "ZiG", "AUD",
+        "ZAR", "MZN", "AED",
+    ];
+    const currenciesDropdown = [
+        "BWP", "GBP", "EUR",
+        "NAD", "ZiG", "AUD",
+        "ZAR", "MZN", "AED",
+        "USD"
+    ];
     // const ratesCountry = Object.keys(data.conversion_rates);
     // const ratesVal = Object.values(data.conversion_rates);
-    // Object.entries(data.conversion_rates).forEach(([key, value]) => {
-    //     console.log(`${key} ${value}`)
-    // });
+    // Object.entries(data.conversion_rates) loopy woopy
 
     const rates = currencies.map(currency => {
         if (currency === "ZiG") {
@@ -69,15 +70,47 @@ const renderChart = async () => {
             return data.conversion_rates[currency];
         }
     });
-    console.log("rates:", rates, "currencies:", currencies);
+    // console.log("rates:", rates, "currencies:", currencies);
+
+
+    const dropdownRates = currenciesDropdown.map(currency => {
+        if (currency !== "ZiG") {
+            return data.conversion_rates[convertedCurrency];
+        }
+    });
+    console.log("dropdownRates:", dropdownRates, "currencies:", currencies);
+    // const dropdownRates = data.conversion_rates[convertedCurrency];
+
 
     new Chart(ctx, {
         type: "bar",
         data: {
             labels: currencies,
             datasets: [{
-                label: "Rates against 1 USD",
+                label: "All rates against 1 USD",
                 data: rates,
+                backgroundColor: [
+                    "rgba(255, 99, 132, 0.2)",
+                    "rgba(255, 159, 64, 0.2)",
+                    "rgba(255, 205, 86, 0.2)",
+                    "rgba(75, 192, 192, 0.2)",
+                    "rgba(54, 162, 235, 0.2)",
+                    "rgba(153, 102, 255, 0.2)",
+                    "rgba(201, 203, 207, 0.2)",
+                    "rgba(255, 0, 0, 0.2)",
+                    "rgba(128, 0, 128, 0.2)"
+                ],
+                borderColor: [
+                    "rgb(255, 99, 132)",
+                    "rgb(255, 159, 64)",
+                    "rgb(255, 205, 86)",
+                    "rgb(75, 192, 192)",
+                    "rgb(54, 162, 235)",
+                    "rgb(153, 102, 255)",
+                    "rgb(201, 203, 207)",
+                    "rgb(255, 0, 0)",
+                    "rgb(128, 0, 128)"
+                ],
                 borderWidth: 1
             }]
         },
@@ -110,9 +143,20 @@ const renderChart = async () => {
     // });
 };
 
+const convertCurrency = () => {
+    const amount = document.getElementById("amount").value;
+    // currency picker thing
+    const convertedCurrency = document.getElementById("convertedCurrency").value;
+
+    // const dropdownRates = data.conversion_rates[convertedCurrency];
+
+    const converted = amount * zigToUsdRate;
+    document.getElementById("converted").value = converted.toFixed(2);
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     registerServiceWorker();
-    renderChart();
+    renderData();
 
     const convertButton = document.getElementById("convertButton");
     if (convertButton) {
