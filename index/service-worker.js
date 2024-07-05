@@ -1,7 +1,7 @@
 "use strict";
 
 let db;
-let cacheName = "weasel_cache-v2";
+let cacheName = "kwese-converter_cache-v1";
 
 const cacheAssets = async (assets) => {
     const cache = await caches.open(cacheName);
