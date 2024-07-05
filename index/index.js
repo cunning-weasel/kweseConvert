@@ -32,17 +32,13 @@ const convertCurrency = () => {
 const callAPis = async () => {
     try {
         const apiUrl = `https://v6.exchangerate-api.com/v6/8a8edde2a4ac1fc683a3698f/latest/USD`;
-        const apiUrlPair = `https://v6.exchangerate-api.com/v6/8a8edde2a4ac1fc683a3698f/pair/USD/ZAR`;
 
         const apiResponse = await fetch(apiUrl);
-        const apiResponsePair = await fetch(apiUrlPair);
-        if (!apiResponse.ok || !apiResponsePair) {
+        if (!apiResponse.ok) {
             throw new Error("Failed to fetch data from echangeRate API");
         }
         const data = await apiResponse.json();
-        const dataPair = await apiResponsePair.json();
-        console.log("data:", data);
-        console.log("dataPair:", dataPair);
+        // console.log("data:", data);
         return data;
     } catch (error) {
         console.error("Error:", error);
@@ -59,17 +55,29 @@ const renderChart = async () => {
         return;
     }
 
-    // need: USD, ZAR, GBP, BWP, ZiG, EUR, NAD, MZN, ZWL
-    // const labels = Object.keys(data.rates);
-    // const rates = Object.values(data.conversion_rates);
+    const currencies = ["GBP", "EUR", "NAD", "MZN", "ZiG"];
+    // const ratesCountry = Object.keys(data.conversion_rates);
+    // const ratesVal = Object.values(data.conversion_rates);
+    // Object.entries(data.conversion_rates).forEach(([key, value]) => {
+    //     console.log(`${key} ${value}`)
+    // });
+
+    const rates = currencies.map(currency => {
+        if (currency === "ZiG") {
+            return zigToUsdRate;
+        } else {
+            return data.conversion_rates[currency];
+        }
+    });
+    console.log("rates:", rates, "currencies:", currencies);
 
     new Chart(ctx, {
         type: "bar",
         data: {
-            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+            labels: currencies,
             datasets: [{
-                label: "Rates at a glance",
-                data: [12, 19, 3, 5, 2, 3],
+                label: "Rates against 1 USD",
+                data: rates,
                 borderWidth: 1
             }]
         },
