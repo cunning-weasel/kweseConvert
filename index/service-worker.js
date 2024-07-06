@@ -2,6 +2,7 @@
 
 let db;
 let cacheName = "kwese-converter_cache-v1";
+const allowedOrigin = self.location.origin;
 
 const cacheAssets = async (assets) => {
     const cache = await caches.open(cacheName);
@@ -10,10 +11,11 @@ const cacheAssets = async (assets) => {
 
 const putInCache = async (request, response) => {
     try {
-        const cache = await caches.open(cacheName);
-        await cache.put(request, response);
-    }
-    catch (err) {
+        if (request.url.startsWith(allowedOrigin)) {
+            const cache = await caches.open(cacheName);
+            await cache.put(request, response);
+        }
+    } catch (err) {
         console.error(err);
     }
 };
@@ -33,7 +35,7 @@ const deleteOldCaches = async () => {
     }));
 };
 
-// offline first caching strategy
+// offline-first caching strategy
 const assetHandler = async (request, preloadResponsePromise) => {
     const cachedRes = await caches.match(request);
     if (cachedRes) {
@@ -61,7 +63,8 @@ self.addEventListener("install", (ev) => {
     ev.waitUntil(
         cacheAssets([
             "index.html",
-            "index.js"
+            "index.js",
+            "*png"
         ]),
     );
 });

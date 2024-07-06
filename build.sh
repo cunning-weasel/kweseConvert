@@ -25,7 +25,6 @@ esac
 
 compile_and_execute
 
-
 # # simple alternative:
 # CommonFlags="-Wall -Werror -Wno-write-strings -Wno-unused-variable -Wno-sign-compare"
 
