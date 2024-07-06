@@ -3,24 +3,24 @@
 
 const zigToUsdRate = 0.0727; // hardcoded rate for ZiG to USD - scrap later?
 
-// const registerServiceWorker = async () => {
-//     if ("serviceWorker" in navigator) {
-//         try {
-//             const registration = await navigator.serviceWorker.register("/service-worker.js", {
-//                 scope: "/",
-//             });
-//             if (registration.installing) {
-//                 console.log("Service worker installing");
-//             } else if (registration.waiting) {
-//                 console.log("Service worker installed");
-//             } else if (registration.active) {
-//                 console.log("Service worker active");
-//             }
-//         } catch (error) {
-//             console.error(`Registration failed with ${error}`);
-//         }
-//     }
-// };
+const registerServiceWorker = async () => {
+    if ("serviceWorker" in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register("/service-worker.js", {
+                scope: "/",
+            });
+            if (registration.installing) {
+                console.log("Service worker installing");
+            } else if (registration.waiting) {
+                console.log("Service worker installed");
+            } else if (registration.active) {
+                console.log("Service worker active");
+            }
+        } catch (error) {
+            console.error(`Registration failed with ${error}`);
+        }
+    }
+};
 
 const convertCurrency = () => {
     const amount = document.getElementById("amount").value;
