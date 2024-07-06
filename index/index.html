@@ -35,8 +35,8 @@
           <!-- inputs should take inputs 2 ways -->
           <div class="form-group row">
             <div class="col">
-              <label for="amount">🇿🇼 ZiG</label> <!-- hardcoded val -->
-              <input type="number" id="amount" class="form-control" placeholder="0">
+              <label for="zigAmount">🇿🇼 ZiG</label> <!-- hardcoded val -->
+              <input type="number" id="zigAmount" class="form-control" placeholder="0">
             </div>
             <div class="col">
               <select id="selectableCurrency" class="form-select border border-0 p-0">
@@ -48,8 +48,10 @@
                 <option value="NAD">🇳🇦 NAD</option>
                 <option value="MZN">🇲🇿 MZN</option>
                 <option value="ZMW">🇿🇲 ZMW</option>
+                <option value="AUD">🇦🇺 AUD</option>
+                <option value="AED">🇦🇪 AED</option>
               </select>
-              <input type="number" id="converted" class="form-control" placeholder="0">
+              <input type="number" id="foreXAmount" class="form-control" placeholder="0">
             </div>
             <div class="d-grid gap-2">
               <button class="btn btn-outline-light my-3" id="clearButton">Clear</button>
