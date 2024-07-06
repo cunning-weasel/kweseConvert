@@ -3,6 +3,7 @@
 
 const zigToUsdRate = 0.0730; // hardcoded rate for ZiG to USD - scrap later
 let exchangeRatesData = null;
+let lastUpdate = null;
 
 const registerServiceWorker = async () => {
     if ("serviceWorker" in navigator) {
@@ -32,7 +33,7 @@ const fetchData = async () => {
         }
 
         const data = await apiResponse.json();
-        // console.log("data:", data);
+        // console.log("api res data:", data);
         return data;
     } catch (error) {
         console.error("Error:", error);
@@ -61,17 +62,23 @@ const renderData = async () => {
         "BWP", "GBP", "EUR",
         "NAD", "ZiG", "AUD",
         "ZAR", "MZN", "AED",
-        "USD"
+        "USD", "ZMW"
     ];
 
     const rates = currencies.map(currency => {
         if (currency === "ZiG") {
-            return zigToUsdRate;
+            return (1 / zigToUsdRate); // zig normalize to 1 USD
         } else {
             return data.conversion_rates[currency];
         }
     });
     console.log("rates:", rates, "currencies:", currencies);
+
+    lastUpdate = data.time_last_update_utc;
+    console.log("last update:", lastUpdate);
+    
+    // currency x to zig:
+    // zig amount = amount in currency x * (usd to currency rate / usd to zig rate)
 
     new Chart(ctx, {
         type: "bar",
@@ -115,8 +122,20 @@ const renderData = async () => {
     });
 };
 
+// To-Do: should update all parts of page where USD is referenced
+// also need to add update date-time from api call!
+const updateRateDisplay = async () => {
+    const selectedCurrency = document.getElementById("selectableCurrency").value;
+
+
+    document.getElementsByClassName("text-muted").textContent = `Updated ${lastUpdate}`;
+    document.getElementById("rateDisplay").textContent = `1 Ziggy Marley = ${zigToUsdRate} USD`;
+    document.getElementById("conversionDescription").textContent = `Convert Zimbabwe ZiG to ${selectedCurrency}`;
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     registerServiceWorker();
+    updateRateDisplay();
     renderData();
 
     const amount = document.getElementById("amount");
@@ -124,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const clearButton = document.getElementById("clearButton");
     clearButton.addEventListener("click", () => {
-        // Reset all values to 0
+        // reset all values to 0
         document.getElementById("amount").value = "";
         document.getElementById("converted").value = "";
     });

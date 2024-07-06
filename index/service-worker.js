@@ -9,7 +9,7 @@ const cacheAssets = async (assets) => {
     try {
         await cache.addAll(assets);
     } catch (error) {
-        console.error("Failed to cache assets:", error);
+        console.error("Failed to add static cache assets:", error);
     }
 };
 
@@ -39,6 +39,7 @@ const deleteOldCaches = async () => {
     }));
 };
 
+// offline-first strategy
 const assetHandler = async (request, preloadResponsePromise) => {
     const cachedRes = await caches.match(request);
     if (cachedRes) {
@@ -56,7 +57,7 @@ const assetHandler = async (request, preloadResponsePromise) => {
         putInCache(request, networkRes.clone());
         return networkRes;
     } catch (error) {
-        console.error("Failed to fetch from network:", error);
+        console.error("assetHander err:", error);
     }
 };
 
