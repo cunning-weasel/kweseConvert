@@ -3,23 +3,32 @@
 
 const zigToUsdRate = 0.0727; // hardcoded rate for ZiG to USD - scrap later?
 
-const registerServiceWorker = async () => {
-    if ("serviceWorker" in navigator) {
-        try {
-            const registration = await navigator.serviceWorker.register("/service-worker.js", {
-                scope: "/",
-            });
-            if (registration.installing) {
-                console.log("Service worker installing");
-            } else if (registration.waiting) {
-                console.log("Service worker installed");
-            } else if (registration.active) {
-                console.log("Service worker active");
-            }
-        } catch (error) {
-            console.error(`Registration failed with ${error}`);
-        }
-    }
+// const registerServiceWorker = async () => {
+//     if ("serviceWorker" in navigator) {
+//         try {
+//             const registration = await navigator.serviceWorker.register("/service-worker.js", {
+//                 scope: "/",
+//             });
+//             if (registration.installing) {
+//                 console.log("Service worker installing");
+//             } else if (registration.waiting) {
+//                 console.log("Service worker installed");
+//             } else if (registration.active) {
+//                 console.log("Service worker active");
+//             }
+//         } catch (error) {
+//             console.error(`Registration failed with ${error}`);
+//         }
+//     }
+// };
+
+const convertCurrency = () => {
+    const amount = document.getElementById("amount").value;
+    // To-Do: currency picker
+    const convertedCurrency = document.getElementById("convertedCurrency").value;
+
+    const converted = amount * zigToUsdRate;
+    document.getElementById("converted").value = converted.toFixed(2);
 };
 
 const fetchData = async () => {
@@ -128,17 +137,8 @@ const renderData = async () => {
     // });
 };
 
-const convertCurrency = () => {
-    const amount = document.getElementById("amount").value;
-    // To-Do: currency picker
-    const convertedCurrency = document.getElementById("convertedCurrency").value;
-
-    const converted = amount * zigToUsdRate;
-    document.getElementById("converted").value = converted.toFixed(2);
-};
-
 document.addEventListener("DOMContentLoaded", () => {
-    registerServiceWorker();
+    // registerServiceWorker();
     renderData();
 
     const convertButton = document.getElementById("convertButton");

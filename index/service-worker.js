@@ -2,11 +2,15 @@
 
 let db;
 let cacheName = "kwese-converter_cache-v1";
-const allowedOrigin = self.location.origin;
+const allowedOrigin = self.location.origin; // Your domain origin
 
 const cacheAssets = async (assets) => {
     const cache = await caches.open(cacheName);
-    await cache.addAll(assets);
+    try {
+        await cache.addAll(assets);
+    } catch (error) {
+        console.error("Failed to cache assets:", error);
+    }
 };
 
 const putInCache = async (request, response) => {
@@ -16,7 +20,7 @@ const putInCache = async (request, response) => {
             await cache.put(request, response);
         }
     } catch (err) {
-        console.error(err);
+        console.error("Failed to put in cache:", err);
     }
 };
 
@@ -35,7 +39,6 @@ const deleteOldCaches = async () => {
     }));
 };
 
-// offline-first caching strategy
 const assetHandler = async (request, preloadResponsePromise) => {
     const cachedRes = await caches.match(request);
     if (cachedRes) {
@@ -50,11 +53,10 @@ const assetHandler = async (request, preloadResponsePromise) => {
 
     try {
         const networkRes = await fetch(request);
-        // To-Do: same-domain ? cache reqs : return networkRes 
         putInCache(request, networkRes.clone());
         return networkRes;
     } catch (error) {
-        console.error(error);
+        console.error("Failed to fetch from network:", error);
     }
 };
 
@@ -64,21 +66,22 @@ self.addEventListener("install", (ev) => {
         cacheAssets([
             "index.html",
             "index.js",
-            "*png"
-        ]),
+            "*.png"
+        ])
     );
 });
 
 self.addEventListener("activate", (ev) => {
     ev.waitUntil(
-        enableNavPreload(),
-        deleteOldCaches(),
+        Promise.all([
+            enableNavPreload(),
+            deleteOldCaches()
+        ])
     );
 });
 
 self.addEventListener("fetch", (ev) => {
     ev.respondWith(assetHandler(ev.request));
-    // IIFE wraps async code as e.waitUnitll expects func returning promise
     ev.waitUntil((async () => {
         const preloadResPromise = ev.preloadResponse;
         if (preloadResPromise) {

@@ -15,6 +15,11 @@
 #define BUFFER_SIZE 600
 #define PATH_MAX 4096
 
+// MAP_ANONYMOUS is not defined on Mac OS X and some other UNIX systems.
+#ifndef MAP_ANONYMOUS
+#define MAP_ANONYMOUS MAP_ANON
+#endif
+
 size_t weasel_len(char *string)
 {
     char *p = string;
@@ -77,12 +82,19 @@ void *arena_allocate(Arena *arena, size_t size)
 {
     if (arena->used + size > arena->base + arena->size)
     {
-        perror("Not enough space in arena");
+        fprintf(stderr, "Not enough space in arena: requested %zu bytes, %zu bytes available\n", size, arena->size - (arena->used - arena->base));
         return NULL;
     }
     char *new_used = arena->used;
     arena->used += size;
+    fprintf(stderr, "Allocated %zu bytes, %zu bytes remaining\n", size, arena->size - (arena->used - arena->base));
     return new_used;
+}
+
+void arena_reset(Arena *arena)
+{
+    arena->used = arena->base;
+    fprintf(stderr, ">> Arena memory reset\n");
 }
 
 void arena_release(Arena *arena)
@@ -118,61 +130,65 @@ void read_file(Arena *arena, int newsockfd, char *uri)
 
     char filepath[PATH_MAX];
     snprintf(filepath, sizeof(filepath), "index%s", uri);
-
     printf("Attempting to open file: %s\n", filepath);
 
     FILE *fp = fopen(filepath, "rb");
-    if (fp)
-    {
-        fseek(fp, 0, SEEK_END);
-        size_t file_size = ftell(fp);
-        fseek(fp, 0, SEEK_SET);
-
-        char *buffer = (char *)arena_allocate(arena, file_size);
-        if (!buffer)
-        {
-            perror("arena_allocate");
-            fclose(fp);
-            return;
-        }
-
-        size_t bytes_read = fread(buffer, 1, file_size, fp);
-        fclose(fp);
-
-        if (bytes_read != file_size)
-        {
-            perror("fread");
-            return;
-        }
-
-        char *content_type = "text/html"; // default content type
-        if (strstr(uri, ".js"))
-        {
-            content_type = "text/javascript";
-        }
-        else if (strstr(uri, ".json"))
-        {
-            content_type = "application/json";
-        }
-        else if (strstr(uri, ".png"))
-        {
-            content_type = "image/png";
-        }
-        else if (strstr(uri, ".css"))
-        {
-            content_type = "text/css";
-        }
-        else if (strstr(uri, ".svg"))
-        {
-            content_type = "image/svg+xml";
-        }
-
-        send_full_res(newsockfd, buffer, content_type, file_size);
-    }
-    else
+    if (!fp)
     {
         perror("fopen");
+        char *not_found = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: 13\r\n\r\n404 Not Found";
+        write(newsockfd, not_found, custom_strlen_cacher(not_found));
+        return;
     }
+
+    fseek(fp, 0, SEEK_END);
+    size_t file_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    char *buffer = (char *)arena_allocate(arena, file_size);
+    if (!buffer)
+    {
+        perror("arena_allocate");
+        fclose(fp);
+        return;
+    }
+
+    size_t bytes_read = fread(buffer, 1, file_size, fp);
+    fclose(fp);
+
+    if (bytes_read != file_size)
+    {
+        perror("fread");
+        return;
+    }
+
+    char *content_type = "text/html"; // default content type
+    if (strstr(uri, ".js"))
+    {
+        content_type = "text/javascript";
+    }
+    else if (strstr(uri, ".json"))
+    {
+        content_type = "application/json";
+    }
+    else if (strstr(uri, ".png"))
+    {
+        content_type = "image/png";
+    }
+    else if (strstr(uri, ".css"))
+    {
+        content_type = "text/css";
+    }
+    else if (strstr(uri, ".svg"))
+    {
+        content_type = "image/svg+xml";
+    }
+    else if (strstr(uri, ".ico"))
+    {
+        content_type = "image/x-icon";
+    }
+
+    send_full_res(newsockfd, buffer, content_type, file_size);
 }
 
 void handle_client(Arena *arena, int newsockfd)
@@ -186,8 +202,11 @@ void handle_client(Arena *arena, int newsockfd)
         return;
     }
 
+    buffer[valread] = '\0'; // ensure null-terminated string
+
     char method[BUFFER_SIZE], uri[BUFFER_SIZE], version[BUFFER_SIZE];
     sscanf(buffer, "%s %s %s", method, uri, version);
+    printf("Client request: %s %s %s\n", method, uri, version);
 
     read_file(arena, newsockfd, uri);
     close(newsockfd);
@@ -234,9 +253,14 @@ int setup_server()
 
 int main()
 {
-    Arena *arena = create_arena(500 * 1024 * 1024); // 500MB
+    signal(SIGPIPE, SIG_IGN); // ignore SIGPIPE signals
+
+    Arena *arena = create_arena(60 * 1024 * 1024); // 60MB
     int sockfd = setup_server();
     printf("Server listening on http://localhost:%d\n", PORT);
+
+    int request_count = 0;
+    const int max_requests_before_reset = 2;
 
     while (1)
     {
@@ -251,6 +275,13 @@ int main()
         }
 
         handle_client(arena, newsockfd);
+        request_count++;
+
+        if (request_count >= max_requests_before_reset)
+        {
+            arena_reset(arena);
+            request_count = 0;
+        }
     }
 
     close(sockfd);
