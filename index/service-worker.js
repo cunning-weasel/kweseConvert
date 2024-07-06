@@ -65,9 +65,8 @@ self.addEventListener("install", (ev) => {
     ev.waitUntil(
         cacheAssets([
             "index.html",
-            "index.js",
-            "*.png"
-        ])
+            "index.js"
+        ]),
     );
 });
 
