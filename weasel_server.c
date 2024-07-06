@@ -260,7 +260,7 @@ int main()
     printf("Server listening on http://localhost:%d\n", PORT);
 
     int request_count = 0;
-    const int max_requests_before_reset = 2;
+    const int max_requests_before_reset = 10;
 
     while (1)
     {

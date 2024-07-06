@@ -1,7 +1,8 @@
 "use strict";
 // https://zimpricecheck.com/price-updates/official-and-black-market-exchange-rates/
 
-const zigToUsdRate = 0.0727; // hardcoded rate for ZiG to USD - scrap later?
+const zigToUsdRate = 0.0730; // hardcoded rate for ZiG to USD - scrap later
+let exchangeRatesData = null;
 
 const registerServiceWorker = async () => {
     if ("serviceWorker" in navigator) {
@@ -22,15 +23,6 @@ const registerServiceWorker = async () => {
     }
 };
 
-const convertCurrency = () => {
-    const amount = document.getElementById("amount").value;
-    // To-Do: currency picker
-    const convertedCurrency = document.getElementById("convertedCurrency").value;
-
-    const converted = amount * zigToUsdRate;
-    document.getElementById("converted").value = converted.toFixed(2);
-};
-
 const fetchData = async () => {
     try {
         const apiUrl = `https://v6.exchangerate-api.com/v6/8a8edde2a4ac1fc683a3698f/latest/USD`;
@@ -48,6 +40,14 @@ const fetchData = async () => {
     }
 };
 
+const convertCurrency = () => {
+    const amount = document.getElementById("amount").value;
+    const selectedCurrency = document.getElementById("selectableCurrency").value;
+
+    const converted = amount * zigToUsdRate;
+    document.getElementById("converted").value = converted.toFixed(2);
+};
+
 const renderData = async () => {
     const ctx = document.getElementById("myChart");
     const data = await fetchData();
@@ -63,9 +63,6 @@ const renderData = async () => {
         "ZAR", "MZN", "AED",
         "USD"
     ];
-    // const ratesCountry = Object.keys(data.conversion_rates);
-    // const ratesVal = Object.values(data.conversion_rates);
-    // Object.entries(data.conversion_rates) loopy woopy
 
     const rates = currencies.map(currency => {
         if (currency === "ZiG") {
@@ -116,35 +113,19 @@ const renderData = async () => {
             }
         }
     });
-
-    // new Chart(ctx, {
-    //     type: "line",
-    //     data: {
-    //         labels: ["db_res", "db_res", "db_res", "db_res", "db_res", "db_res"],
-    //         datasets: [{
-    //             label: "ZiG to USD last 14 Days",
-    //             data: [100, 65, 59, 81, 56, 40],
-    //             borderWidth: 1
-    //         }]
-    //     },
-    //     options: {
-    //         scales: {
-    //             y: {
-    //                 beginAtZero: true
-    //             }
-    //         }
-    //     }
-    // });
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    // registerServiceWorker();
+    registerServiceWorker();
     renderData();
 
-    const convertButton = document.getElementById("convertButton");
-    if (convertButton) {
-        convertButton.addEventListener("click", convertCurrency);
-    } else {
-        console.error("Convert button not found.");
-    }
+    const amount = document.getElementById("amount");
+    amount.addEventListener("input", convertCurrency);
+
+    const clearButton = document.getElementById("clearButton");
+    clearButton.addEventListener("click", () => {
+        // Reset all values to 0
+        document.getElementById("amount").value = "";
+        document.getElementById("converted").value = "";
+    });
 });

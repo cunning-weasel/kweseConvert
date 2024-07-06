@@ -2,7 +2,7 @@
   "name": "kwese-converter",
   "short_name": "kwese-converter",
   "description": "developed by cunning_weasel",
-  "display": "standalone",
+  "display": "fullscreen",
   "start_url": "/",
   "theme_color": "#ffffff",
   "background_color": "#ffffff",

@@ -2,7 +2,7 @@
 
 let db;
 let cacheName = "kwese-converter_cache-v1";
-const allowedOrigin = self.location.origin; // Your domain origin
+const allowedOrigin = self.location.origin;
 
 const cacheAssets = async (assets) => {
     const cache = await caches.open(cacheName);
