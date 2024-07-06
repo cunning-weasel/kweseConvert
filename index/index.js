@@ -3,33 +3,32 @@
 
 const zigToUsdRate = 0.0730; // hardcoded rate for ZiG to USD - scrap later
 let exchangeRatesData = null;
-let lastUpdate = null;
 
-const registerServiceWorker = async () => {
-    if ("serviceWorker" in navigator) {
-        try {
-            const registration = await navigator.serviceWorker.register("/service-worker.js", {
-                scope: "/",
-            });
-            if (registration.installing) {
-                console.log("Service worker installing");
-            } else if (registration.waiting) {
-                console.log("Service worker installed");
-            } else if (registration.active) {
-                console.log("Service worker active");
-            }
-        } catch (error) {
-            console.error(`Registration failed with ${error}`);
-        }
-    }
-};
+// const registerServiceWorker = async () => {
+//     if ("serviceWorker" in navigator) {
+//         try {
+//             const registration = await navigator.serviceWorker.register("/service-worker.js", {
+//                 scope: "/",
+//             });
+//             if (registration.installing) {
+//                 console.log("Service worker installing");
+//             } else if (registration.waiting) {
+//                 console.log("Service worker installed");
+//             } else if (registration.active) {
+//                 console.log("Service worker active");
+//             }
+//         } catch (error) {
+//             console.error(`Registration failed with ${error}`);
+//         }
+//     }
+// };
 
 const fetchData = async () => {
     try {
         const apiUrl = `https://v6.exchangerate-api.com/v6/8a8edde2a4ac1fc683a3698f/latest/USD`;
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
-            throw new Error("Failed to fetch data from echangeRate API");
+            throw new Error("Failed fetchData()");
         }
 
         const data = await apiResponse.json();
@@ -43,13 +42,15 @@ const fetchData = async () => {
 
 const convertCurrency = () => {
     const amount = document.getElementById("amount").value;
-    const selectedCurrency = document.getElementById("selectableCurrency").value;
 
     const converted = amount * zigToUsdRate;
     document.getElementById("converted").value = converted.toFixed(2);
+
+    // currency x to zig:
+    // zig amount = amount in currency x * (usd to currency rate / usd to zig rate)
 };
 
-const renderData = async () => {
+const renderChart = async () => {
     const ctx = document.getElementById("myChart");
     const data = await fetchData();
 
@@ -59,10 +60,10 @@ const renderData = async () => {
     }
 
     const currencies = [
-        "BWP", "GBP", "EUR",
+        "USD", "GBP", "EUR",
         "NAD", "ZiG", "AUD",
         "ZAR", "MZN", "AED",
-        "USD", "ZMW"
+        "BWP", "ZMW"
     ];
 
     const rates = currencies.map(currency => {
@@ -72,13 +73,7 @@ const renderData = async () => {
             return data.conversion_rates[currency];
         }
     });
-    console.log("rates:", rates, "currencies:", currencies);
-
-    lastUpdate = data.time_last_update_utc;
-    console.log("last update:", lastUpdate);
-    
-    // currency x to zig:
-    // zig amount = amount in currency x * (usd to currency rate / usd to zig rate)
+    // console.log("rates:", rates, "currencies:", currencies);
 
     new Chart(ctx, {
         type: "bar",
@@ -124,22 +119,33 @@ const renderData = async () => {
 
 // To-Do: should update all parts of page where USD is referenced
 // also need to add update date-time from api call!
-const updateRateDisplay = async () => {
+const updateDisplayElems = async () => {
     const selectedCurrency = document.getElementById("selectableCurrency").value;
+    const data = await fetchData();
 
+    if (!data) {
+        console.error("No data available to update display elems.");
+        return;
+    }
 
-    document.getElementsByClassName("text-muted").textContent = `Updated ${lastUpdate}`;
-    document.getElementById("rateDisplay").textContent = `1 Ziggy Marley = ${zigToUsdRate} USD`;
+    // update time
+    const lastUpdate = data.time_last_update_utc.slice(0, -6);
+    // console.log("last update:", lastUpdate);
+
+    document.getElementById("text-muted").textContent = `Updated ${lastUpdate}`;
     document.getElementById("conversionDescription").textContent = `Convert Zimbabwe ZiG to ${selectedCurrency}`;
+    document.getElementById("rateDisplay").textContent = `1 Ziggy Marley = ${zigToUsdRate} USD`;
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    registerServiceWorker();
-    updateRateDisplay();
-    renderData();
+    // registerServiceWorker();
+    updateDisplayElems();
+    renderChart();
 
     const amount = document.getElementById("amount");
     amount.addEventListener("input", convertCurrency);
+
+
 
     const clearButton = document.getElementById("clearButton");
     clearButton.addEventListener("click", () => {
@@ -147,4 +153,5 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("amount").value = "";
         document.getElementById("converted").value = "";
     });
+
 });
