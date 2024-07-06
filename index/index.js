@@ -2,26 +2,25 @@
 // https://zimpricecheck.com/price-updates/official-and-black-market-exchange-rates/
 
 const zigToUsdRate = 0.0730; // hardcoded rate for ZiG to USD - scrap later
-let exchangeRatesData = null;
 
-// const registerServiceWorker = async () => {
-//     if ("serviceWorker" in navigator) {
-//         try {
-//             const registration = await navigator.serviceWorker.register("/service-worker.js", {
-//                 scope: "/",
-//             });
-//             if (registration.installing) {
-//                 console.log("Service worker installing");
-//             } else if (registration.waiting) {
-//                 console.log("Service worker installed");
-//             } else if (registration.active) {
-//                 console.log("Service worker active");
-//             }
-//         } catch (error) {
-//             console.error(`Registration failed with ${error}`);
-//         }
-//     }
-// };
+const registerServiceWorker = async () => {
+    if ("serviceWorker" in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register("/service-worker.js", {
+                scope: "/",
+            });
+            if (registration.installing) {
+                console.log("Service worker installing");
+            } else if (registration.waiting) {
+                console.log("Service worker installed");
+            } else if (registration.active) {
+                console.log("Service worker active");
+            }
+        } catch (error) {
+            console.error(`Registration failed with ${error}`);
+        }
+    }
+};
 
 const fetchData = async () => {
     try {
@@ -42,12 +41,13 @@ const fetchData = async () => {
 
 const convertCurrency = () => {
     const amount = document.getElementById("amount").value;
-
     const converted = amount * zigToUsdRate;
     document.getElementById("converted").value = converted.toFixed(2);
 
-    // currency x to zig:
+    // currency x to zig
     // zig amount = amount in currency x * (usd to currency rate / usd to zig rate)
+    
+
 };
 
 const renderChart = async () => {
@@ -128,9 +128,7 @@ const updateDisplayElems = async () => {
         return;
     }
 
-    // update time
     const lastUpdate = data.time_last_update_utc.slice(0, -6);
-    // console.log("last update:", lastUpdate);
 
     document.getElementById("text-muted").textContent = `Updated ${lastUpdate}`;
     document.getElementById("conversionDescription").textContent = `Convert Zimbabwe ZiG to ${selectedCurrency}`;
@@ -145,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const amount = document.getElementById("amount");
     amount.addEventListener("input", convertCurrency);
 
+    // to-do: add event listener for converted to do reverse calc
 
 
     const clearButton = document.getElementById("clearButton");
