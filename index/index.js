@@ -39,24 +39,37 @@ const fetchData = async () => {
     }
 };
 
-const convertCurrency = async () => {
-    const zigAmount = document.getElementById("zigAmount").value;
-    const foreXAmount = document.getElementById("foreXAmount").value;
+const convertZigToForex = async () => {
+    const zigAmount = parseFloat(document.getElementById("zigAmount").value);
     const selectedCurrency = document.getElementById("selectableCurrency").value;
+    // console.log("zigAmount:", zigAmount);
 
     const data = await fetchData();
     if (!data) {
-        console.error("No data available to convertCurrency.");
+        console.error("No data available to convertZigToForex.");
         return;
-    };
+    }
 
-    if (zigAmount) {
-        // convert ZiG to the selected currency
+    if (!isNaN(zigAmount) && zigAmount > 0) {
         let conversionRate = (zigAmount * zigToUsdConversionRate) * data.conversion_rates[selectedCurrency];
         document.getElementById("foreXAmount").value = conversionRate.toFixed(2);
-    } else if (foreXAmount) {
-        // convert the selected currency to ZiG
+    }
+};
+
+const convertForexToZig = async () => {
+    const foreXAmount = parseFloat(document.getElementById("foreXAmount").value);
+    const selectedCurrency = document.getElementById("selectableCurrency").value;
+    // console.log("foreXAmount:", foreXAmount);
+
+    const data = await fetchData();
+    if (!data) {
+        console.error("No data available to convertForexToZig.");
+        return;
+    }
+
+    if (!isNaN(foreXAmount) && foreXAmount > 0) {
         let conversionRate = (foreXAmount / data.conversion_rates[selectedCurrency]) / zigToUsdConversionRate;
+        // console.log("conversionRate:", conversionRate);
         document.getElementById("zigAmount").value = conversionRate.toFixed(2);
     }
 };
@@ -153,11 +166,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const foreXAmount = document.getElementById("foreXAmount");
     const selectableCurrency = document.getElementById("selectableCurrency");
 
-    zigAmount.addEventListener("input", convertCurrency);
-    foreXAmount.addEventListener("input", convertCurrency);
+
+    zigAmount.addEventListener("input", () => {
+        // clear foreign amount before converting
+        foreXAmount.value = "";
+        convertZigToForex();
+    });
+
+    foreXAmount.addEventListener("input", () => {
+        // clear zig amount before converting
+        zigAmount.value = "";
+        convertForexToZig();
+    });
+
     selectableCurrency.addEventListener("change", () => {
         updateDisplayElems();
-        convertCurrency();
+        // convert based on whichever field has value
+        if (zigAmount.value) {
+            convertZigToForex();
+        } else if (foreXAmount.value) {
+            convertForexToZig();
+        }
     });
 
     const clearButton = document.getElementById("clearButton");
