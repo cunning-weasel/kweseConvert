@@ -23,25 +23,9 @@ const registerServiceWorker = async () => {
     }
 };
 
-const fetchConfig = async () => {
+const fetchApiData = async () => {
     try {
-        const res = await fetch("/config.json");
-        if (!res.ok) {
-            throw new Error("Network res error");
-        }
-        const config = await res.json();
-        const apiSecret = config.API_SECRET;
-        console.log("API Secret:", apiSecret);
-
-        await fetchApiData(apiSecret);
-    } catch (error) {
-        console.error("fetchConfig err:", error);
-    }
-};
-
-const fetchApiData = async (apiSecret) => {
-    try {
-        const apiUrl = `https://v6.exchangerate-api.com/v6/${apiSecret}/latest/USD`;
+        const apiUrl = `https://v6.exchangerate-api.com/v6/14d15b25ac9c23f769374ae7/latest/USD`;
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
             throw new Error("Failed fetchApiData()");

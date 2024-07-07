@@ -3,6 +3,7 @@
 let db;
 let cacheName = "kwese-converter_cache-v1";
 const allowedOrigin = self.location.origin;
+const endpoint = "https://api.exchangerate-api.com/v4/latest/USD";
 
 const cacheAssets = async (assets) => {
     const cache = await caches.open(cacheName);
@@ -15,7 +16,7 @@ const cacheAssets = async (assets) => {
 
 const putInCache = async (request, response) => {
     try {
-        if (request.url.startsWith(allowedOrigin)) {
+        if (request.url.startsWith(allowedOrigin || request.url === endpoint)) {
             const cache = await caches.open(cacheName);
             await cache.put(request, response);
         }
@@ -61,6 +62,28 @@ const assetHandler = async (request, preloadResponsePromise) => {
     }
 };
 
+// only call api every 24hrs - exchanges rates update at 00:01
+const endpointHandler = async (request) => {
+    const cache = await caches.open(cacheName);
+    const lastCallResponse = await cache.match("last-api-call-timestamp");
+    let lastCallTimestamp = lastCallResponse ? await lastCallResponse.json() : null;
+    let currentTimestamp = Date.now();
+
+    if (lastCallTimestamp && (currentTimestamp - lastCallTimestamp < 24 * 60 * 60 * 1000)) {
+        const cachedRes = await caches.match(request);
+        if (cachedRes) {
+            return cachedRes;
+        }
+    }
+
+    const networkRes = await fetch(request);
+    if (networkRes.ok) {
+        cache.put("last-api-call-timestamp", new Response(JSON.stringify(currentTimestamp)));
+        cache.put(request, networkRes.clone());
+    }
+    return networkRes;
+}
+
 self.addEventListener("install", (ev) => {
     self.skipWaiting();
     ev.waitUntil(
@@ -81,11 +104,19 @@ self.addEventListener("activate", (ev) => {
 });
 
 self.addEventListener("fetch", (ev) => {
-    ev.respondWith(assetHandler(ev.request));
-    ev.waitUntil((async () => {
-        const preloadResPromise = ev.preloadResponse;
-        if (preloadResPromise) {
-            return await preloadResPromise;
-        }
-    })());
+    if (ev.request.url === endpoint) {
+        ev.respondWith(apiHandler(ev.request));
+    } else {
+        ev.respondWith(assetHandler(ev.request, ev.preloadResponse));
+    }
 });
+
+// self.addEventListener("fetch", (ev) => {
+//     ev.respondWith(assetHandler(ev.request));
+//     ev.waitUntil((async () => {
+//         const preloadResPromise = ev.preloadResponse;
+//         if (preloadResPromise) {
+//             return await preloadResPromise;
+//         }
+//     })());
+// });
