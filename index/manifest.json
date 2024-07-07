@@ -1,6 +1,6 @@
 {
-  "name": "kwese-converter",
-  "short_name": "kwese-converter",
+  "name": "kweseConvert",
+  "short_name": "kweseConvert",
   "description": "developed by cunning_weasel",
   "display": "fullscreen",
   "start_url": "/",
