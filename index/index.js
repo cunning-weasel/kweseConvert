@@ -32,7 +32,6 @@ const fetchData = async () => {
         }
 
         const data = await apiResponse.json();
-        // console.log("api res data:", data);
         return data;
     } catch (error) {
         console.error("Error:", error);
@@ -40,61 +39,27 @@ const fetchData = async () => {
     }
 };
 
-const convertCurrency = () => {
+const convertCurrency = async () => {
     const zigAmount = document.getElementById("zigAmount").value;
-    const converted = zigAmount * zigToUsdConversionRate;
-    document.getElementById("foreXAmount").value = converted.toFixed(2);
+    const foreXAmount = document.getElementById("foreXAmount").value;
+    const selectedCurrency = document.getElementById("selectableCurrency").value;
 
-    // const foreXAmount = document.getElementById("foreXAmount").value;
-    // const ZigToUSD = zigAmount * zigToUsdConversionRate;
-    // currency x to zig
-    // zig amount = amount in currency x * (usd to currency rate / usd to zig rate)
+    const data = await fetchData();
+    if (!data) {
+        console.error("No data available to convertCurrency.");
+        return;
+    };
 
-    const foreXSelect = document.getElementById("selectableCurrency");
-    const foreXSelectOptions = foreXSelect.options;
-    // for (let i = 0; i < foreXSelectOptions.length; i++) {
-    //     console.log(`Value: ${foreXSelectOptions[i].value}, Text: ${foreXSelectOptions[i].text}`);
-    //     const selectedValue = foreXSelect.value;
-    //     console.log(`Selected Value: ${selectedValue}`);
-    // }
-
-    const selectedValue = foreXSelect.value;
-    console.log(`Selected Value: ${selectedValue}`);
-
-    switch (selectedValue) {
-        case "USD":
-            usdToZigConversionRate;
-            break;
-        case "ZAR":
-            foreXAmout.value * (endpointZAR / zigToUsdConversionRate);
-            break;
-        case "GBP":
-            foreXAmout.value * (endpointGBP / zigToUsdConversionRate);
-            break;
-        case "BWP":
-            foreXAmout.value * (endpointGBP / zigToUsdConversionRate);
-            break;
-        case "EUR":
-            foreXAmout.value * (endpointGBP / zigToUsdConversionRate);
-            break;
-        case "NAD":
-            foreXAmout.value * (endpointGBP / zigToUsdConversionRate);
-            break;
-        case "MZN":
-            foreXAmout.value * (endpointGBP / zigToUsdConversionRate);
-            break;
-        case "ZMW":
-            foreXAmout.value * (endpointGBP / zigToUsdConversionRate);
-            break;
-        case "USD":
-            foreXAmout.value * (endpointGBP / zigToUsdConversionRate);
-            break;
-        case "USD":
-            foreXAmout.value * (endpointGBP / zigToUsdConversionRate);
-            break;
-
-        default:
-            break;
+    if (zigAmount) {
+        // ZiG to the selected currency
+        // let conversionRate = data.conversion_rates[selectedCurrency] / zigToUsdConversionRate;
+        let conversionRate = zigToUsdConversionRate / data.conversion_rates[selectedCurrency];
+        document.getElementById("foreXAmount").value = (zigAmount * conversionRate).toFixed(2);
+    } else if (foreXAmount) {
+        // the selected currency to ZiG
+        let conversionRate = data.conversion_rates[selectedCurrency] / zigToUsdConversionRate;
+        // let conversionRate = zigToUsdConversionRate / data.conversion_rates[selectedCurrency];
+        document.getElementById("zigAmount").value = (foreXAmount * conversionRate).toFixed(2);
     }
 
 };
@@ -169,8 +134,8 @@ const renderChart = async () => {
 // To-Do: should update all parts of page where USD is referenced
 const updateDisplayElems = async () => {
     const selectedCurrency = document.getElementById("selectableCurrency").value;
-    const data = await fetchData();
 
+    const data = await fetchData();
     if (!data) {
         console.error("No data available to update display elems.");
         return;
@@ -188,7 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateDisplayElems();
     renderChart();
 
-    // to-do: add event listener for foreXAmount to do reverse calc
     const zigAmount = document.getElementById("zigAmount");
     const foreXAmount = document.getElementById("foreXAmount");
 
@@ -201,5 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("zigAmount").value = "";
         document.getElementById("foreXAmount").value = "";
     });
+    document.getElementById("selectableCurrency").addEventListener("change", updateDisplayElems);
 
 });
