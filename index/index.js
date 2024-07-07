@@ -23,12 +23,28 @@ const registerServiceWorker = async () => {
     }
 };
 
-const fetchData = async () => {
+const fetchConfig = async () => {
+    try {
+        const res = await fetch("config.json");
+        if (!res.ok) {
+            throw new Error("Network res error");
+        }
+        const config = await res.json();
+        const apiSecret = config.API_SECRET;
+        console.log("API Secret:", apiSecret);
+
+        await fetchApiData(apiSecret);
+    } catch (error) {
+        console.error("fetchConfig err:", error);
+    }
+};
+
+const fetchApiData = async (apiSecret) => {
     try {
         const apiUrl = `https://v6.exchangerate-api.com/v6/8a8edde2a4ac1fc683a3698f/latest/USD`;
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
-            throw new Error("Failed fetchData()");
+            throw new Error("Failed fetchApiData()");
         }
 
         const data = await apiResponse.json();
@@ -44,7 +60,7 @@ const convertZigToForex = async () => {
     const selectedCurrency = document.getElementById("selectableCurrency").value;
     // console.log("zigAmount:", zigAmount);
 
-    const data = await fetchData();
+    const data = await fetchApiData();
     if (!data) {
         console.error("No data available to convertZigToForex.");
         return;
@@ -61,7 +77,7 @@ const convertForexToZig = async () => {
     const selectedCurrency = document.getElementById("selectableCurrency").value;
     // console.log("foreXAmount:", foreXAmount);
 
-    const data = await fetchData();
+    const data = await fetchApiData();
     if (!data) {
         console.error("No data available to convertForexToZig.");
         return;
@@ -76,7 +92,7 @@ const convertForexToZig = async () => {
 
 const renderChart = async () => {
     const ctx = document.getElementById("myChart");
-    const data = await fetchData();
+    const data = await fetchApiData();
 
     if (!data) {
         console.error("No data available to render chart.");
@@ -144,7 +160,7 @@ const renderChart = async () => {
 const updateDisplayElems = async () => {
     const selectedCurrency = document.getElementById("selectableCurrency").value;
 
-    const data = await fetchData();
+    const data = await fetchApiData();
     if (!data) {
         console.error("No data available to update display elems.");
         return;
@@ -158,7 +174,7 @@ const updateDisplayElems = async () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    // registerServiceWorker();
+    registerServiceWorker();
     updateDisplayElems();
     renderChart();
 
@@ -166,9 +182,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const foreXAmount = document.getElementById("foreXAmount");
     const selectableCurrency = document.getElementById("selectableCurrency");
 
-
     zigAmount.addEventListener("input", () => {
-        // clear foreign amount before converting
+        // clear forex amount before converting
         foreXAmount.value = "";
         convertZigToForex();
     });
