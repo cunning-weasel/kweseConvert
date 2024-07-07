@@ -25,7 +25,7 @@ const registerServiceWorker = async () => {
 
 const fetchConfig = async () => {
     try {
-        const res = await fetch("config.json");
+        const res = await fetch("/config.json");
         if (!res.ok) {
             throw new Error("Network res error");
         }
@@ -41,7 +41,7 @@ const fetchConfig = async () => {
 
 const fetchApiData = async (apiSecret) => {
     try {
-        const apiUrl = `https://v6.exchangerate-api.com/v6/8a8edde2a4ac1fc683a3698f/latest/USD`;
+        const apiUrl = `https://v6.exchangerate-api.com/v6/${apiSecret}/latest/USD`;
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
             throw new Error("Failed fetchApiData()");

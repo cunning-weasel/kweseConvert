@@ -1,4 +1,5 @@
 config.json
+index/config.json
 .env
 
 output_weasel_server
