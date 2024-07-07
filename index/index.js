@@ -51,15 +51,14 @@ const convertCurrency = async () => {
     };
 
     if (zigAmount) {
-        // Convert ZiG to the selected currency
+        // convert ZiG to the selected currency
         let conversionRate = (zigAmount * zigToUsdConversionRate) * data.conversion_rates[selectedCurrency];
         document.getElementById("foreXAmount").value = conversionRate.toFixed(2);
     } else if (foreXAmount) {
-        // Convert the selected currency to ZiG
+        // convert the selected currency to ZiG
         let conversionRate = (foreXAmount / data.conversion_rates[selectedCurrency]) / zigToUsdConversionRate;
         document.getElementById("zigAmount").value = conversionRate.toFixed(2);
     }
-
 };
 
 const renderChart = async () => {
@@ -129,7 +128,6 @@ const renderChart = async () => {
     });
 };
 
-// To-Do: should update all parts of page where USD is referenced
 const updateDisplayElems = async () => {
     const selectedCurrency = document.getElementById("selectableCurrency").value;
 
@@ -164,9 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const clearButton = document.getElementById("clearButton");
     clearButton.addEventListener("click", () => {
-        // reset all values to 0
         document.getElementById("zigAmount").value = "";
         document.getElementById("foreXAmount").value = "";
     });
-
 });
