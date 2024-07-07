@@ -51,15 +51,13 @@ const convertCurrency = async () => {
     };
 
     if (zigAmount) {
-        // ZiG to the selected currency
-        // let conversionRate = data.conversion_rates[selectedCurrency] / zigToUsdConversionRate;
-        let conversionRate = zigToUsdConversionRate / data.conversion_rates[selectedCurrency];
-        document.getElementById("foreXAmount").value = (zigAmount * conversionRate).toFixed(2);
+        // Convert ZiG to the selected currency
+        let conversionRate = (zigAmount * zigToUsdConversionRate) * data.conversion_rates[selectedCurrency];
+        document.getElementById("foreXAmount").value = conversionRate.toFixed(2);
     } else if (foreXAmount) {
-        // the selected currency to ZiG
-        let conversionRate = data.conversion_rates[selectedCurrency] / zigToUsdConversionRate;
-        // let conversionRate = zigToUsdConversionRate / data.conversion_rates[selectedCurrency];
-        document.getElementById("zigAmount").value = (foreXAmount * conversionRate).toFixed(2);
+        // Convert the selected currency to ZiG
+        let conversionRate = (foreXAmount / data.conversion_rates[selectedCurrency]) / zigToUsdConversionRate;
+        document.getElementById("zigAmount").value = conversionRate.toFixed(2);
     }
 
 };
@@ -155,9 +153,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const zigAmount = document.getElementById("zigAmount");
     const foreXAmount = document.getElementById("foreXAmount");
+    const selectableCurrency = document.getElementById("selectableCurrency");
 
     zigAmount.addEventListener("input", convertCurrency);
     foreXAmount.addEventListener("input", convertCurrency);
+    selectableCurrency.addEventListener("change", () => {
+        updateDisplayElems();
+        convertCurrency();
+    });
 
     const clearButton = document.getElementById("clearButton");
     clearButton.addEventListener("click", () => {
@@ -165,6 +168,5 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("zigAmount").value = "";
         document.getElementById("foreXAmount").value = "";
     });
-    document.getElementById("selectableCurrency").addEventListener("change", updateDisplayElems);
 
 });
