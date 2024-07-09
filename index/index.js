@@ -3,8 +3,10 @@
 // To-Do: global search on to-do's. 
 // Also, last To-Do: swap out api keys!
 
-const zigToUsdConversionRate = 0.0728; // hardcoded rate for ZiG to USD - scrap later
+const zigToUsdConversionRate = 0.0728; // official hardcoded rate for ZiG to USD - scrap later
 const usdToZigConversionRate = 1 / zigToUsdConversionRate;
+const usdToZigLowestInformalSecConversionRate = 14.0000;
+const usdToZigHighestInformalSecConversionRate = 20.0000;
 
 const registerServiceWorker = async () => {
     if ("serviceWorker" in navigator) {
@@ -87,19 +89,25 @@ const renderChart = async () => {
 
     const currencies = [
         "USD", "GBP", "EUR",
-        "NAD", "ZiG", "AUD",
-        "ZAR", "MZN", "AED",
-        "BWP", "ZMW"
+        "NAD", "ZiG", "ZiG_LIS",
+        "ZiG_HIS", "AUD", "ZAR",
+        "MZN", "AED", "BWP",
+        "ZMW"
     ];
 
     const rates = currencies.map(currency => {
         if (currency === "ZiG") {
             return (usdToZigConversionRate);
-        } else {
+        } else if (currency === "ZiG_LIS") {
+            return (usdToZigLowestInformalSecConversionRate);
+        } else if (currency === "ZiG_HIS") {
+            return (usdToZigHighestInformalSecConversionRate);
+        }
+        else {
             return data.conversion_rates[currency];
         }
     });
-    // console.log("rates:", rates, "currencies:", currencies);
+    console.log("rates:", rates, "currencies:", currencies);
 
     new Chart(ctx, {
         type: "bar",
@@ -114,6 +122,8 @@ const renderChart = async () => {
                     "rgba(255, 205, 86, 0.2)",
                     "rgba(75, 192, 192, 0.2)",
                     "rgba(54, 162, 235, 0.2)",
+                    "rgba(0, 255, 0, 0.2)",
+                    "rgba(255, 255, 0, 0.2)",
                     "rgba(153, 102, 255, 0.2)",
                     "rgba(201, 203, 207, 0.2)",
                     "rgba(255, 0, 0, 0.2)",
@@ -125,6 +135,8 @@ const renderChart = async () => {
                     "rgb(255, 205, 86)",
                     "rgb(75, 192, 192)",
                     "rgb(54, 162, 235)",
+                    "rgb(0, 255, 0)",
+                    "rgb(255, 255, 0)",
                     "rgb(153, 102, 255)",
                     "rgb(201, 203, 207)",
                     "rgb(255, 0, 0)",

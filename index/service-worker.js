@@ -108,16 +108,20 @@ self.addEventListener("fetch", (ev) => {
     if (ev.request.url === endpoint) {
         ev.respondWith(endpointHandler(ev.request));
     } else {
-        ev.respondWith(assetHandler(ev.request, ev.preloadResponse));
+        ev.respondWith(assetHandler(ev.request));
     }
+    ev.waitUntil((async () => {
+        const preloadResPromise = ev.preloadResponse;
+        if (preloadResPromise) {
+            return await preloadResPromise;
+        }
+    })());
 });
 
 // self.addEventListener("fetch", (ev) => {
-//     ev.respondWith(assetHandler(ev.request));
-//     ev.waitUntil((async () => {
-//         const preloadResPromise = ev.preloadResponse;
-//         if (preloadResPromise) {
-//             return await preloadResPromise;
-//         }
-//     })());
+//     if (ev.request.url === endpoint) {
+//         ev.respondWith(endpointHandler(ev.request));
+//     } else {
+//         ev.respondWith(assetHandler(ev.request, ev.preloadResponse));
+//     }
 // });
