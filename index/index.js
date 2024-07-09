@@ -1,5 +1,7 @@
 "use strict";
 // https://zimpricecheck.com/price-updates/official-and-black-market-exchange-rates/
+// To-Do: global search on to-do's. 
+// Also, last To-Do: swap out api keys!
 
 const zigToUsdConversionRate = 0.0730; // hardcoded rate for ZiG to USD - scrap later
 const usdToZigConversionRate = 1 / zigToUsdConversionRate;

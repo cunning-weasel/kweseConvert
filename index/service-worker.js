@@ -3,7 +3,7 @@
 let db;
 let cacheName = "kweseConvert_cache-v1";
 const allowedOrigin = self.location.origin;
-const endpoint = "https://api.exchangerate-api.com/v4/latest/USD";
+const endpoint = "https://v6.exchangerate-api.com/v6/14d15b25ac9c23f769374ae7/latest/USD";
 
 const cacheAssets = async (assets) => {
     const cache = await caches.open(cacheName);
@@ -91,9 +91,6 @@ self.addEventListener("install", (ev) => {
         cacheAssets([
             "index.html",
             "index.js",
-            ".png",
-            ".ico",
-            ".svg"
         ]),
     );
 });
@@ -109,7 +106,7 @@ self.addEventListener("activate", (ev) => {
 
 self.addEventListener("fetch", (ev) => {
     if (ev.request.url === endpoint) {
-        ev.respondWith(apiHandler(ev.request));
+        ev.respondWith(endpointHandler(ev.request));
     } else {
         ev.respondWith(assetHandler(ev.request, ev.preloadResponse));
     }
