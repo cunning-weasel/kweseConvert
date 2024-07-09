@@ -27,9 +27,7 @@ compile_and_execute
 
 # # simple alternative:
 # CommonFlags="-Wall -Werror -Wno-write-strings -Wno-unused-variable -Wno-sign-compare"
-
 # # 64-bit build
 # gcc $CommonFlags weasel_server.c -o weasel_server.x86_64 -g -Wl,-rpath,'$ORIGIN/x86_64'
-
 # # 32-bit build
 # gcc -m32 $CommonFlags weasel_server.c -o weasel_server.x86 -g -Wl,-rpath,'$ORIGIN/x86'

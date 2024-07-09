@@ -88,11 +88,9 @@ const renderChart = async () => {
     }
 
     const currencies = [
-        "USD", "GBP", "EUR",
-        "NAD", "ZiG", "ZiG_LIS",
-        "ZiG_HIS", "AUD", "ZAR",
-        "MZN", "AED", "BWP",
-        "ZMW"
+        // "USD", 
+        "GBP", "EUR", "NAD", "ZiG", "ZiG_LIS", "ZiG_HIS",
+        "AUD", "ZAR", "MZN", "AED", "BWP", "ZMW"
     ];
 
     const rates = currencies.map(currency => {
@@ -107,7 +105,7 @@ const renderChart = async () => {
             return data.conversion_rates[currency];
         }
     });
-    console.log("rates:", rates, "currencies:", currencies);
+    // console.log("rates:", rates, "currencies:", currencies);
 
     new Chart(ctx, {
         type: "bar",
@@ -117,7 +115,7 @@ const renderChart = async () => {
                 label: "All rates against 1 USD",
                 data: rates,
                 backgroundColor: [
-                    "rgba(255, 99, 132, 0.2)",
+                    // "rgba(255, 99, 132, 0.2)",
                     "rgba(255, 159, 64, 0.2)",
                     "rgba(255, 205, 86, 0.2)",
                     "rgba(75, 192, 192, 0.2)",
@@ -130,7 +128,7 @@ const renderChart = async () => {
                     "rgba(128, 0, 128, 0.2)"
                 ],
                 borderColor: [
-                    "rgb(255, 99, 132)",
+                    // "rgb(255, 99, 132)",
                     "rgb(255, 159, 64)",
                     "rgb(255, 205, 86)",
                     "rgb(75, 192, 192)",
