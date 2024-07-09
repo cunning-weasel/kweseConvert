@@ -117,11 +117,3 @@ self.addEventListener("fetch", (ev) => {
         }
     })());
 });
-
-// self.addEventListener("fetch", (ev) => {
-//     if (ev.request.url === endpoint) {
-//         ev.respondWith(endpointHandler(ev.request));
-//     } else {
-//         ev.respondWith(assetHandler(ev.request, ev.preloadResponse));
-//     }
-// });

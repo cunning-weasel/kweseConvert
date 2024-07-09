@@ -1,7 +1,5 @@
 "use strict";
 // https://zimpricecheck.com/price-updates/official-and-black-market-exchange-rates/
-// To-Do: global search on to-do's. 
-// Also, last To-Do: swap out api keys!
 
 const zigToUsdConversionRate = 0.0728; // official hardcoded rate for ZiG to USD - scrap later
 const usdToZigConversionRate = 1 / zigToUsdConversionRate;
@@ -88,9 +86,9 @@ const renderChart = async () => {
     }
 
     const currencies = [
-        // "USD", 
-        "GBP", "EUR", "NAD", "ZiG", "ZiG_LIS", "ZiG_HIS",
-        "AUD", "ZAR", "MZN", "AED", "BWP", "ZMW"
+        "USD", "GBP", "EUR", "NAD", "ZiG", "ZiG_LIS",
+        "ZiG_HIS", "AUD", "ZAR", "MZN", "AED", "BWP",
+        "ZMW"
     ];
 
     const rates = currencies.map(currency => {
@@ -115,7 +113,7 @@ const renderChart = async () => {
                 label: "All rates against 1 USD",
                 data: rates,
                 backgroundColor: [
-                    // "rgba(255, 99, 132, 0.2)",
+                    "rgba(255, 99, 132, 0.2)",
                     "rgba(255, 159, 64, 0.2)",
                     "rgba(255, 205, 86, 0.2)",
                     "rgba(75, 192, 192, 0.2)",
@@ -128,7 +126,7 @@ const renderChart = async () => {
                     "rgba(128, 0, 128, 0.2)"
                 ],
                 borderColor: [
-                    // "rgb(255, 99, 132)",
+                    "rgb(255, 99, 132)",
                     "rgb(255, 159, 64)",
                     "rgb(255, 205, 86)",
                     "rgb(75, 192, 192)",
@@ -179,13 +177,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectableCurrency = document.getElementById("selectableCurrency");
 
     zigAmount.addEventListener("input", () => {
-        // clear forex amount before converting
+        // clear forex before converting
         foreXAmount.value = "";
         convertZigToForex();
     });
 
     foreXAmount.addEventListener("input", () => {
-        // clear zig amount before converting
+        // clear zig before converting
         zigAmount.value = "";
         convertForexToZig();
     });

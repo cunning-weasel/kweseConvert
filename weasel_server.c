@@ -20,6 +20,11 @@
 #define MAP_ANONYMOUS MAP_ANON
 #endif
 
+// To-Do's:
+// 1. simple .txt db to store rolling 30 day data on ZiG and others
+// 1.b. expose endpoint to frontend to fetch db data
+// 2. custom file reading
+
 size_t weasel_len(char *string)
 {
     char *p = string;
