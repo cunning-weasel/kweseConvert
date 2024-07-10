@@ -25,6 +25,23 @@ const registerServiceWorker = async () => {
     }
 };
 
+// grab nginx apiurl
+// const fetchApiKey = async () => {
+//     try {
+//         const apiUrl = "/api-url";
+//         const apiResponse = await fetch(apiUrl);
+//         if (!apiResponse.ok) {
+//             throw new Error("Failed fetchApiData()");
+//         }
+
+//         const api-key-url = await apiResponse.text();
+//         return api-key-url;
+//     } catch (error) {
+//         console.error("Error:", error);
+//         return null;
+//     }
+// };
+
 const fetchApiData = async () => {
     try {
         const apiUrl = `https://v6.exchangerate-api.com/v6/14d15b25ac9c23f769374ae7/latest/USD`;
@@ -44,7 +61,6 @@ const fetchApiData = async () => {
 const convertZigToForex = async () => {
     const zigAmount = parseFloat(document.getElementById("zigAmount").value);
     const selectedCurrency = document.getElementById("selectableCurrency").value;
-    // console.log("zigAmount:", zigAmount);
 
     const data = await fetchApiData();
     if (!data) {
@@ -61,7 +77,6 @@ const convertZigToForex = async () => {
 const convertForexToZig = async () => {
     const foreXAmount = parseFloat(document.getElementById("foreXAmount").value);
     const selectedCurrency = document.getElementById("selectableCurrency").value;
-    // console.log("foreXAmount:", foreXAmount);
 
     const data = await fetchApiData();
     if (!data) {
@@ -71,7 +86,6 @@ const convertForexToZig = async () => {
 
     if (!isNaN(foreXAmount) && foreXAmount > 0) {
         let conversionRate = (foreXAmount / data.conversion_rates[selectedCurrency]) / zigToUsdConversionRate;
-        // console.log("conversionRate:", conversionRate);
         document.getElementById("zigAmount").value = conversionRate.toFixed(2);
     }
 };
@@ -103,7 +117,6 @@ const renderChart = async () => {
             return data.conversion_rates[currency];
         }
     });
-    // console.log("rates:", rates, "currencies:", currencies);
 
     new Chart(ctx, {
         type: "bar",
@@ -177,20 +190,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectableCurrency = document.getElementById("selectableCurrency");
 
     zigAmount.addEventListener("input", () => {
-        // clear forex before converting
         foreXAmount.value = "";
         convertZigToForex();
     });
 
     foreXAmount.addEventListener("input", () => {
-        // clear zig before converting
         zigAmount.value = "";
         convertForexToZig();
     });
 
     selectableCurrency.addEventListener("change", () => {
         updateDisplayElems();
-        // convert based on whichever field has value
         if (zigAmount.value) {
             convertZigToForex();
         } else if (foreXAmount.value) {

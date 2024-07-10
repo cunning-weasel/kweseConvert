@@ -62,7 +62,7 @@ const assetHandler = async (request, preloadResponsePromise) => {
     }
 };
 
-// only call api every 24hrs - exchanges rates update at 00:01
+// only call api every 24hrs
 const endpointHandler = async (request) => {
     const cache = await caches.open(cacheName);
     const lastCallResponse = await cache.match("last-api-call-timestamp");
