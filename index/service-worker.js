@@ -3,7 +3,7 @@
 let db;
 let cacheName = "kweseConvert_cache-v1";
 const allowedOrigin = self.location.origin;
-const endpoint = "https://v6.exchangerate-api.com/v6/14d15b25ac9c23f769374ae7/latest/USD";
+const endpoint = "https://v6.exchangerate-api.com/v6/226c5a3e79c312d8ff7bc68a/latest/USD";
 
 const cacheAssets = async (assets) => {
     const cache = await caches.open(cacheName);

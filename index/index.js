@@ -44,7 +44,8 @@ const registerServiceWorker = async () => {
 
 const fetchApiData = async () => {
     try {
-        const apiUrl = `https://v6.exchangerate-api.com/v6/14d15b25ac9c23f769374ae7/latest/USD`;
+        // To-Do: apiUrl = api-key-url etc 
+        const apiUrl = `https://v6.exchangerate-api.com/v6/226c5a3e79c312d8ff7bc68a/latest/USD`;
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
             throw new Error("Failed fetchApiData()");
