@@ -1,7 +1,3 @@
-config.json
-index/config.json
-.env
-
+server.log
+server_err.log
 output_weasel_server
-weasel_server.x86_64
-weasel_server.x86
