@@ -355,3 +355,40 @@ Allocated 18872 bytes, 62888680 bytes remaining
 Allocated 3359 bytes, 62885321 bytes remaining
 Allocated 3320 bytes, 62882001 bytes remaining
 Allocated 7008 bytes, 62874993 bytes remaining
+Allocated 3320 bytes, 62871673 bytes remaining
+Allocated 3325 bytes, 62868348 bytes remaining
+Allocated 3320 bytes, 62865028 bytes remaining
+Allocated 7163 bytes, 62857865 bytes remaining
+Allocated 3325 bytes, 62854540 bytes remaining
+>> Arena memory reset
+Allocated 3320 bytes, 62911240 bytes remaining
+Allocated 3325 bytes, 62907915 bytes remaining
+Allocated 3320 bytes, 62904595 bytes remaining
+Allocated 7163 bytes, 62897432 bytes remaining
+Allocated 3320 bytes, 62894112 bytes remaining
+Allocated 3325 bytes, 62890787 bytes remaining
+Allocated 3320 bytes, 62887467 bytes remaining
+Allocated 3325 bytes, 62884142 bytes remaining
+Allocated 56747 bytes, 62827395 bytes remaining
+Allocated 3320 bytes, 62824075 bytes remaining
+>> Arena memory reset
+Allocated 7163 bytes, 62907397 bytes remaining
+Allocated 18872 bytes, 62888525 bytes remaining
+fopen: No such file or directory
+fopen: No such file or directory
+Allocated 3320 bytes, 62885205 bytes remaining
+Allocated 3325 bytes, 62881880 bytes remaining
+Allocated 3320 bytes, 62878560 bytes remaining
+Allocated 3325 bytes, 62875235 bytes remaining
+Allocated 3320 bytes, 62871915 bytes remaining
+Allocated 3325 bytes, 62868590 bytes remaining
+>> Arena memory reset
+Allocated 3320 bytes, 62911240 bytes remaining
+Allocated 3325 bytes, 62907915 bytes remaining
+Allocated 3320 bytes, 62904595 bytes remaining
+Allocated 3320 bytes, 62901275 bytes remaining
+Allocated 3325 bytes, 62897950 bytes remaining
+Allocated 3325 bytes, 62894625 bytes remaining
+Allocated 3320 bytes, 62891305 bytes remaining
+Allocated 3325 bytes, 62887980 bytes remaining
+Allocated 3325 bytes, 62884655 bytes remaining
