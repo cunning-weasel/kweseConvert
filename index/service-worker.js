@@ -68,7 +68,7 @@ const endpointHandler = async (request) => {
     const lastCallResponse = await cache.match("last-api-call-timestamp");
     let lastCallTimestamp = lastCallResponse ? await lastCallResponse.json() : null;
     let currentTimestamp = Date.now();
-    console.log(`currentTimestamp: ${currentTimestamp}, lastCallTimestamp: ${lastCallTimestamp}`);
+    // console.log(`currentTimestamp: ${currentTimestamp}, lastCallTimestamp: ${lastCallTimestamp}`);
 
     if (lastCallTimestamp && (currentTimestamp - lastCallTimestamp < 24 * 60 * 60 * 1000)) {
         const cachedRes = await caches.match(request);

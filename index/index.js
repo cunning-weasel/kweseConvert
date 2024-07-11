@@ -101,17 +101,17 @@ const renderChart = async () => {
     }
 
     const currencies = [
-        "USD", "GBP", "EUR", "NAD", "ZiG", "ZiG_LIS",
-        "ZiG_HIS", "AUD", "ZAR", "MZN", "AED", "BWP",
+        "USD", "GBP", "EUR", "NAD", "ZiG", "ZiG-Low",
+        "ZiG-High", "AUD", "ZAR", "MZN", "AED", "BWP",
         "ZMW"
     ];
 
     const rates = currencies.map(currency => {
         if (currency === "ZiG") {
             return (usdToZigConversionRate);
-        } else if (currency === "ZiG_LIS") {
+        } else if (currency === "ZiG-Low") {
             return (usdToZigLowestInformalSecConversionRate);
-        } else if (currency === "ZiG_HIS") {
+        } else if (currency === "ZiG-High") {
             return (usdToZigHighestInformalSecConversionRate);
         }
         else {
@@ -178,7 +178,7 @@ const updateDisplayElems = async () => {
 
     document.getElementById("text-muted").textContent = `Updated ${lastUpdate}`;
     document.getElementById("conversionDescription").textContent = `Convert Zimbabwe ZiG to ${selectedCurrency}`;
-    document.getElementById("rateDisplay").textContent = `1 Ziggy Marley = ${zigToUsdConversionRate} USD`;
+    document.getElementById("rateDisplay").textContent = `1 ZiG = ${zigToUsdConversionRate} USD`;
 };
 
 document.addEventListener("DOMContentLoaded", () => {

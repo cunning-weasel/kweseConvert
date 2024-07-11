@@ -92,14 +92,14 @@ void *arena_allocate(Arena *arena, size_t size)
     }
     char *new_used = arena->used;
     arena->used += size;
-    fprintf(stderr, "Allocated %zu bytes, %zu bytes remaining\n", size, arena->size - (arena->used - arena->base));
+    // fprintf(stderr, "Allocated %zu bytes, %zu bytes remaining\n", size, arena->size - (arena->used - arena->base));
     return new_used;
 }
 
 void arena_reset(Arena *arena)
 {
     arena->used = arena->base;
-    fprintf(stderr, ">> Arena memory reset\n");
+    // fprintf(stderr, ">> Arena memory reset\n");
 }
 
 void arena_release(Arena *arena)
@@ -135,7 +135,7 @@ void read_file(Arena *arena, int newsockfd, char *uri)
 
     char filepath[PATH_MAX];
     snprintf(filepath, sizeof(filepath), "index%s", uri);
-    printf("Attempting to open file: %s\n", filepath);
+    // printf("Attempting to open file: %s\n", filepath);
 
     FILE *fp = fopen(filepath, "rb");
     if (!fp)
@@ -211,7 +211,7 @@ void handle_client(Arena *arena, int newsockfd)
 
     char method[BUFFER_SIZE], uri[BUFFER_SIZE], version[BUFFER_SIZE];
     sscanf(buffer, "%s %s %s", method, uri, version);
-    printf("Client request: %s %s %s\n", method, uri, version);
+    // printf("Client request: %s %s %s\n", method, uri, version);
 
     read_file(arena, newsockfd, uri);
     close(newsockfd);
