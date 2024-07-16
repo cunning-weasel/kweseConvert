@@ -1,10 +1,10 @@
 "use strict";
 // https://zimpricecheck.com/price-updates/official-and-black-market-exchange-rates/
 
-const zigToUsdConversionRate = 0.0728; // official hardcoded rate for ZiG to USD - scrap later
+const zigToUsdConversionRate = 0.0588; // official hardcoded rate for ZiG to USD i.e 1 / 17 = 0.0588
 const usdToZigConversionRate = 1 / zigToUsdConversionRate;
-const usdToZigLowestInformalSecConversionRate = 14.0000;
-const usdToZigHighestInformalSecConversionRate = 20.0000;
+const usdToZigLowestInformalSecConversionRate = 20.0000;
+const usdToZigHighestInformalSecConversionRate = 35.0000;
 
 const registerServiceWorker = async () => {
     if ("serviceWorker" in navigator) {
