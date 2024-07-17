@@ -1,7 +1,7 @@
 "use strict";
 
 let db;
-let cacheName = "kweseConvert_cache-v1";
+let cacheName = "kweseConvert_cache-v3";
 const allowedOrigin = self.location.origin;
 const endpoint = "https://v6.exchangerate-api.com/v6/226c5a3e79c312d8ff7bc68a/latest/USD";
 
