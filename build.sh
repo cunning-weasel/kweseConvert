@@ -15,7 +15,7 @@ compile_and_execute() {
 }
 
 case $choice in
-    1) gcc -g weasel_server.c -o output_weasel_server -Og -Wall -Wextra -Wpedantic -Og -g3 -fsanitize=address,undefined ;;
+    1) gcc -Og weasel_server.c -o output_weasel_server -Wall -Wextra -Wpedantic -g3 -fsanitize=address,undefined ;;
     2) gcc -o output_weasel_server weasel_server.c ;;
     3) gcc -o output_weasel_server weasel_server.c -O3 ;;
     *) echo "Invalid option" ;;
@@ -33,3 +33,5 @@ compile_and_execute
 # # run gdb and regular exe:
 # gdb main
 # ./main
+# # note -m32 flag compiles for 32 bit target, and -m64 for 64 bit. gcc defaults to 
+# # whatever the system is 32/64
