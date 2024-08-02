@@ -1,7 +1,7 @@
 "use strict";
 
-let db;
-let cacheName = "kweseConvert_cache-v3";
+let dbName = "exchangeRatesDB-v2";
+let cacheName = "kweseConvert_cache-v2";
 const allowedOrigin = self.location.origin;
 const endpoint = "https://v6.exchangerate-api.com/v6/226c5a3e79c312d8ff7bc68a/latest/USD";
 
@@ -40,8 +40,85 @@ const deleteOldCaches = async () => {
     }));
 };
 
+const openIndexedDB = () => {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, 1);
+
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains("rates")) {
+                db.createObjectStore("rates", { keyPath: "base" });
+            }
+        };
+
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+
+        request.onerror = event => {
+            reject(event.target.error);
+        };
+    });
+};
+
+const storeInIndexedDB = async (key, data) => {
+    const db = await openIndexedDB();
+    const tx = db.transaction("rates", "readwrite");
+    const store = tx.objectStore("rates");
+    store.put({ base: key, data });
+    await tx.complete;
+};
+
+const getFromIndexedDB = async (key) => {
+    const db = await openIndexedDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction("rates", "readonly");
+        const store = tx.objectStore("rates");
+        const request = store.get(key);
+
+        request.onsuccess = () => {
+            resolve(request.result ? request.result.data : null);
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+    });
+};
+
+const deleteOldIndexedDBs = async () => {
+    const databases = await indexedDB.databases();
+    await Promise.all(databases.map(db => {
+        if (db.name !== dbName) {
+            return new Promise((resolve, reject) => {
+                const deleteRequest = indexedDB.deleteDatabase(db.name);
+
+                deleteRequest.onsuccess = () => {
+                    console.log(`IndexedDB ${db.name} deleted successfully.`);
+                    resolve();
+                };
+
+                deleteRequest.onerror = (event) => {
+                    console.error(`Error deleting IndexedDB ${db.name}:`, event.target.error);
+                    reject(event.target.error);
+                };
+
+                deleteRequest.onblocked = () => {
+                    console.warn(`Delete request for IndexedDB ${db.name} is blocked.`);
+                };
+            });
+        }
+    }));
+};
+
+
 // offline-first strategy
 const assetHandler = async (request, preloadResponsePromise) => {
+    const dbData = await getFromIndexedDB(request.url);
+    if (dbData) {
+        return new Response(JSON.stringify(dbData));
+    }
+
     const cachedRes = await caches.match(request);
     if (cachedRes) {
         return cachedRes;
@@ -79,6 +156,8 @@ const endpointHandler = async (request) => {
 
     const networkRes = await fetch(request);
     if (networkRes.ok) {
+        const data = await networkRes.clone().json();
+        storeInIndexedDB(endpoint, data);
         cache.put("last-api-call-timestamp", new Response(JSON.stringify(currentTimestamp)));
         cache.put(request, networkRes.clone());
     }
@@ -99,7 +178,8 @@ self.addEventListener("activate", (ev) => {
     ev.waitUntil(
         Promise.all([
             enableNavPreload(),
-            deleteOldCaches()
+            deleteOldCaches(),
+            deleteOldIndexedDBs()
         ])
     );
     self.clients.claim(); // activate the new service worker immediately
