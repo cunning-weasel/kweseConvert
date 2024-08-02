@@ -25,26 +25,9 @@ const registerServiceWorker = async () => {
     }
 };
 
-// grab nginx apiurl
-// const fetchApiKey = async () => {
-//     try {
-//         const apiUrl = "/api-url";
-//         const apiResponse = await fetch(apiUrl);
-//         if (!apiResponse.ok) {
-//             throw new Error("Failed fetchApiData()");
-//         }
-
-//         const api-key-url = await apiResponse.text();
-//         return api-key-url;
-//     } catch (error) {
-//         console.error("Error:", error);
-//         return null;
-//     }
-// };
-
 const fetchApiData = async () => {
     try {
-        // To-Do: apiUrl = api-key-url etc 
+        // To-Do: api-key-url etc 
         const apiUrl = `https://v6.exchangerate-api.com/v6/226c5a3e79c312d8ff7bc68a/latest/USD`;
         const apiResponse = await fetch(apiUrl);
         if (!apiResponse.ok) {
