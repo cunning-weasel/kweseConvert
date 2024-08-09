@@ -23,6 +23,19 @@ const registerServiceWorker = async () => {
             console.error(`Registration failed with ${error}`);
         }
     }
+
+    if (navigator.storage && navigator.storage.persist) {
+        try {
+            const granted = await navigator.storage.persist();
+            if (granted) {
+                console.log("Storage will not be cleared except by explicit user action");
+            } else {
+                console.log("Storage may be cleared by the UA under storage pressure.");
+            }
+        } catch (err) {
+            console.error(`Storage persist failed with ${err}`);
+        }
+    }
 };
 
 const fetchApiData = async () => {
