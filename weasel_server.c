@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
+#include <assert.h>
 
 #include <time.h>
 #include <sys/socket.h>
@@ -14,6 +15,16 @@
 #define PORT 8080
 #define BUFFER_SIZE 600
 #define PATH_MAX 4096
+
+// To-Do's:
+// 1. replace arena with bump allocator. no need to free and do 2 mb?
+#define PUBKEY_SIZE 32
+#define SIGNATURE_SIZE 64
+#define MAX_RECORDS 100
+/// start address of the memory region used for program heap
+#define HEAP_START_ADDRESS_ (uint64)0x300000000
+/// len of the heap memory region used for program heap - currently 32 kbs - need 3mb?
+#define HEAP_LENGTH_ (uint64)(32 * 1024)
 
 // MAP_ANONYMOUS is not defined on Mac OS X and some other UNIX systems.
 #ifndef MAP_ANONYMOUS
@@ -60,6 +71,55 @@ size_t custom_strlen_cacher(char *str)
     }
 
     return len;
+}
+
+// bump allocator
+// Typedef struct bump_allocator
+// {
+    // uint64 start;
+    // uint64 size;
+// } bump_allocator;
+// 
+// void *alloc(bump_allocator *self, uint64 size, uint64 align)
+// {
+    // uint64 *pos_ptr = (uint64 *)self->start;
+// 
+    // uint64 pos = *pos_ptr;
+    // if (pos == 0)
+    // {
+        // // first time, set starting position
+        // pos = self->start + self->size;
+    // }
+// 
+    // if (pos < size)
+    // {
+        // pos = 0;
+    // }
+    // else
+    // {
+        // pos = pos - size;
+    // }
+// 
+    // // ptr alignment wizardry with bit AND and NOT
+    // pos &= ~(align - 1);
+// 
+    // if (pos < self->start + sizeof(uint8))
+    // {
+        // return NULL;
+    // }
+// 
+    // *pos_ptr = pos;
+    // return (void *)pos;
+// }
+
+// allocator usage
+void entrypoint(void)
+{
+    bump_allocator heap = {HEAP_START_ADDRESS_, HEAP_LENGTH_};
+    assert(0 != alloc(&heap, 1, sizeof(uint64)));
+    printf("No need to free, I'm a bump allocator master weasel");
+    
+    return SUCCESS;
 }
 
 typedef struct Arena
@@ -293,3 +353,4 @@ int main()
     arena_release(arena);
     return 0;
 }
+
