@@ -74,7 +74,7 @@ size_t custom_strlen_cacher(char *str)
 }
 
 // bump allocator
-// Typedef struct bump_allocator
+// typedef struct bump_allocator
 // {
     // uint64 start;
     // uint64 size;
