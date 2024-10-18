@@ -92,7 +92,7 @@ uint64 custom_strlen_cacher(uint8 *str)
     return len;
 }
 
-// bump allocator
+// // bump allocator
 // typedef struct bump_allocator
 // {
     // uint64 start;
@@ -131,7 +131,7 @@ uint64 custom_strlen_cacher(uint8 *str)
     // return (void *)pos;
 // }
 
-// allocator usage
+// // allocator usage
 // void entrypoint(void)
 // {
     // bump_allocator heap = {HEAP_START_ADDRESS_, HEAP_LENGTH_};
