@@ -12,6 +12,25 @@
 #include <sys/mman.h>
 #include <bits/mman-linux.h>
 
+typedef signed char int8;
+typedef short int16;
+typedef int int32;
+typedef long long int64;
+
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+typedef unsigned long long uint64;
+
+typedef int32 bool32;
+typedef float real32;
+typedef double real64;
+typedef enum bool
+{
+    false,
+    true
+} bool;
+
 #define PORT 8080
 #define BUFFER_SIZE 600
 #define PATH_MAX 4096
@@ -23,8 +42,8 @@
 #define MAX_RECORDS 100
 /// start address of the memory region used for program heap
 #define HEAP_START_ADDRESS_ (uint64)0x300000000
-/// len of the heap memory region used for program heap - currently 32 kbs - need 3mb?
-#define HEAP_LENGTH_ (uint64)(32 * 1024)
+/// len of the heap memory region used for program heap - currently 500 kbs - need 3mb?
+#define HEAP_LENGTH_ (uint64)(500 * 1024)
 
 // MAP_ANONYMOUS is not defined on Mac OS X and some other UNIX systems.
 #ifndef MAP_ANONYMOUS
@@ -36,10 +55,10 @@
 // 1.b. expose endpoint to frontend to fetch db data
 // 2. custom file reading
 
-size_t weasel_len(char *string)
+uint64 weasel_len(uint8 *string)
 {
-    char *p = string;
-    size_t len = 0;
+    uint8 *p = string;
+    uint64 len = 0;
 
     while (*p)
     {
@@ -49,12 +68,12 @@ size_t weasel_len(char *string)
     return len;
 }
 
-size_t custom_strlen_cacher(char *str)
+uint64 custom_strlen_cacher(uint8 *str)
 {
-    static char *start = NULL;
-    static char *end = NULL;
-    size_t len = 0;
-    size_t cap = 10000;
+    static uint8 *start = NULL;
+    static uint8 *end = NULL;
+    uint64 len = 0;
+    uint64 cap = 10000;
 
     if (start && str >= start && str <= end)
     {
@@ -113,23 +132,21 @@ size_t custom_strlen_cacher(char *str)
 // }
 
 // allocator usage
-void entrypoint(void)
-{
-    bump_allocator heap = {HEAP_START_ADDRESS_, HEAP_LENGTH_};
-    assert(0 != alloc(&heap, 1, sizeof(uint64)));
-    printf("No need to free, I'm a bump allocator master weasel");
-    
-    return SUCCESS;
-}
+// void entrypoint(void)
+// {
+    // bump_allocator heap = {HEAP_START_ADDRESS_, HEAP_LENGTH_};
+    // assert(0 != alloc(&heap, 1, sizeof(uint64)));
+    // printf("No need to free, I'm a bump allocator master weasel");
+// }
 
 typedef struct Arena
 {
-    char *base;
-    char *used;
-    size_t size;
+    uint8 *base;
+    uint8 *used;
+    uint64 size;
 } Arena;
 
-Arena *create_arena(size_t size)
+Arena *create_arena(uint64 size)
 {
     Arena *arena = (Arena *)mmap(NULL, sizeof(Arena) + size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (arena == MAP_FAILED)
@@ -137,20 +154,20 @@ Arena *create_arena(size_t size)
         perror("mmap");
         exit(EXIT_FAILURE);
     }
-    arena->base = (char *)(arena + 1);
+    arena->base = (uint8 *)(arena + 1);
     arena->used = arena->base;
     arena->size = size;
     return arena;
 }
 
-void *arena_allocate(Arena *arena, size_t size)
+void *arena_allocate(Arena *arena, uint64 size)
 {
     if (arena->used + size > arena->base + arena->size)
     {
         fprintf(stderr, "Not enough space in arena: requested %zu bytes, %zu bytes available\n", size, arena->size - (arena->used - arena->base));
         return NULL;
     }
-    char *new_used = arena->used;
+    uint8 *new_used = arena->used;
     arena->used += size;
     // fprintf(stderr, "Allocated %zu bytes, %zu bytes remaining\n", size, arena->size - (arena->used - arena->base));
     return new_used;
@@ -171,15 +188,15 @@ void arena_release(Arena *arena)
     }
 }
 
-void send_full_res(int newsockfd, char *content, char *content_type, size_t content_length)
+void send_full_res(int newsockfd, uint8 *content, uint8 *content_type, uint64 content_length)
 {
-    char header[1024];
+    uint8 header[1024];
     snprintf(header, sizeof(header), "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %zu\r\n\r\n", content_type, content_length);
     write(newsockfd, header, custom_strlen_cacher(header));
     write(newsockfd, content, content_length);
 }
 
-void read_file(Arena *arena, int newsockfd, char *uri)
+void read_file(Arena *arena, int newsockfd, uint8 *uri)
 {
     if (custom_strlen_cacher(uri) == 0 || (custom_strlen_cacher(uri) == 1 && uri[0] == '/'))
     {
@@ -188,12 +205,12 @@ void read_file(Arena *arena, int newsockfd, char *uri)
 
     if (uri[0] != '/')
     {
-        char temp_uri[BUFFER_SIZE];
+        uint8 temp_uri[BUFFER_SIZE];
         snprintf(temp_uri, sizeof(temp_uri), "/%s", uri);
         strcpy(uri, temp_uri);
     }
 
-    char filepath[PATH_MAX];
+    uint8 filepath[PATH_MAX];
     snprintf(filepath, sizeof(filepath), "index%s", uri);
     // printf("Attempting to open file: %s\n", filepath);
 
@@ -201,16 +218,16 @@ void read_file(Arena *arena, int newsockfd, char *uri)
     if (!fp)
     {
         perror("fopen");
-        char *not_found = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: 13\r\n\r\n404 Not Found";
+        uint8 *not_found = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: 13\r\n\r\n404 Not Found";
         write(newsockfd, not_found, custom_strlen_cacher(not_found));
         return;
     }
 
     fseek(fp, 0, SEEK_END);
-    size_t file_size = ftell(fp);
+    uint64 file_size = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
-    char *buffer = (char *)arena_allocate(arena, file_size);
+    uint8 *buffer = (uint8 *)arena_allocate(arena, file_size);
     if (!buffer)
     {
         perror("arena_allocate");
@@ -218,7 +235,7 @@ void read_file(Arena *arena, int newsockfd, char *uri)
         return;
     }
 
-    size_t bytes_read = fread(buffer, 1, file_size, fp);
+    uint64 bytes_read = fread(buffer, 1, file_size, fp);
     fclose(fp);
 
     if (bytes_read != file_size)
@@ -227,7 +244,7 @@ void read_file(Arena *arena, int newsockfd, char *uri)
         return;
     }
 
-    char *content_type = "text/html"; // default content type
+    uint8 *content_type = "text/html"; // default content type
     if (strstr(uri, ".js"))
     {
         content_type = "text/javascript";
@@ -258,7 +275,7 @@ void read_file(Arena *arena, int newsockfd, char *uri)
 
 void handle_client(Arena *arena, int newsockfd)
 {
-    char buffer[BUFFER_SIZE];
+    uint8 buffer[BUFFER_SIZE];
     int valread = read(newsockfd, buffer, BUFFER_SIZE);
     if (valread < 0)
     {
@@ -269,7 +286,7 @@ void handle_client(Arena *arena, int newsockfd)
 
     buffer[valread] = '\0'; // ensure null-terminated string
 
-    char method[BUFFER_SIZE], uri[BUFFER_SIZE], version[BUFFER_SIZE];
+    uint8 method[BUFFER_SIZE], uri[BUFFER_SIZE], version[BUFFER_SIZE];
     sscanf(buffer, "%s %s %s", method, uri, version);
     // printf("Client request: %s %s %s\n", method, uri, version);
 
