@@ -1,6 +1,6 @@
 "use strict";
 
-let dbName = "exchangeRatesDB-v1";
+let dbName = "exchangeRatesDb-v1";
 let cacheName = "kweseConvert_cache-v1";
 const allowedOrigin = self.location.origin;
 const endpoint = "https://v6.exchangerate-api.com/v6/226c5a3e79c312d8ff7bc68a/latest/USD";
@@ -110,7 +110,6 @@ const deleteOldIndexedDBs = async () => {
         }
     }));
 };
-
 
 // offline-first strategy
 const assetHandler = async (request, preloadResponsePromise) => {
