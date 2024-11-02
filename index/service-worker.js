@@ -138,7 +138,7 @@ const assetHandler = async (request, preloadResponsePromise) => {
     }
 };
 
-// only call api every 24hrs
+// only call api every 72hrs
 const endpointHandler = async (request) => {
     const cache = await caches.open(cacheName);
     const lastCallResponse = await cache.match("last-api-call-timestamp");
@@ -146,7 +146,7 @@ const endpointHandler = async (request) => {
     let currentTimestamp = Date.now();
     // console.log(`currentTimestamp: ${currentTimestamp}, lastCallTimestamp: ${lastCallTimestamp}`);
 
-    if (lastCallTimestamp && (currentTimestamp - lastCallTimestamp < 24 * 60 * 60 * 1000)) {
+    if (lastCallTimestamp && (currentTimestamp - lastCallTimestamp < 72 * 60 * 60 * 1000)) {
         const cachedRes = await caches.match(request);
         if (cachedRes) {
             return cachedRes;
