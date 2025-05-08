@@ -1,10 +1,54 @@
 "use strict";
 // https://zimpricecheck.com/price-updates/official-and-black-market-exchange-rates/
 
-const zigToUsdConversionRate = 0.0349; // official hardcoded rate for ZiG to USD i.e 1 / 17 = 0.0588
+const zigToUsdConversionRate = 0.0373; // official hardcoded rate for ZiG to USD i.e 1 / 17 = 0.0588
 const usdToZigConversionRate = 1 / zigToUsdConversionRate;
-const usdToZigLowestInformalSecConversionRate = 35.0000;
-const usdToZigHighestInformalSecConversionRate = 40.0000;
+const usdToZigLowestInformalSecConversionRate = 38.0000;
+const usdToZigHighestInformalSecConversionRate = 45.0000;
+
+function getUsdRate(currency) {
+    if (currency === "ZiG") return usdToZigConversionRate;
+    if (currency === "ZiG-Low") return usdToZigLowestInformalSecConversionRate;
+    if (currency === "ZiG-High") return usdToZigHighestInformalSecConversionRate;
+    return null; // for API currencies
+}
+
+function getToUsdRate(currency) {
+    if (currency === "ZiG") return zigToUsdConversionRate;
+    if (currency === "ZiG-Low") return 1 / usdToZigLowestInformalSecConversionRate;
+    if (currency === "ZiG-High") return 1 / usdToZigHighestInformalSecConversionRate;
+    return null; // also for API currencies
+}
+
+const convertCurrency = async (direction = "from") => {
+    const fromAmountElem = document.getElementById("fromAmount");
+    const toAmountElem = document.getElementById("toAmount");
+    const fromCurrency = document.getElementById("fromCurrency").value;
+    const toCurrency = document.getElementById("toCurrency").value;
+    const data = await fetchApiData();
+    if (!data) {
+        console.error("No data available to convert.");
+        return;
+    }
+
+    let fromAmount = parseFloat(fromAmountElem.value);
+    let toAmount = parseFloat(toAmountElem.value);
+
+    let fromToUsd = getToUsdRate(fromCurrency) || (1 / data.conversion_rates[fromCurrency]);
+    let toToUsd = getToUsdRate(toCurrency) || (1 / data.conversion_rates[toCurrency]);
+    let fromUsd = getUsdRate(fromCurrency) || data.conversion_rates[fromCurrency];
+    let toUsd = getUsdRate(toCurrency) || data.conversion_rates[toCurrency];
+
+    if (direction === "from" && !isNaN(fromAmount) && fromAmount > 0) {
+        let usdValue = fromAmount * fromToUsd;
+        let result = usdValue * toUsd;
+        toAmountElem.value = result.toFixed(2);
+    } else if (direction === "to" && !isNaN(toAmount) && toAmount > 0) {
+        let usdValue = toAmount * toToUsd;
+        let result = usdValue * fromUsd;
+        fromAmountElem.value = result.toFixed(2);
+    }
+};
 
 const registerServiceWorker = async () => {
     if ("serviceWorker" in navigator) {
@@ -55,40 +99,8 @@ const fetchApiData = async () => {
     }
 };
 
-const convertZigToForex = async () => {
-    const zigAmount = parseFloat(document.getElementById("zigAmount").value);
-    const selectedCurrency = document.getElementById("selectableCurrency").value;
-
-    const data = await fetchApiData();
-    if (!data) {
-        console.error("No data available to convertZigToForex.");
-        return;
-    }
-
-    if (!isNaN(zigAmount) && zigAmount > 0) {
-        let conversionRate = (zigAmount * zigToUsdConversionRate) * data.conversion_rates[selectedCurrency];
-        document.getElementById("foreXAmount").value = conversionRate.toFixed(2);
-    }
-};
-
-const convertForexToZig = async () => {
-    const foreXAmount = parseFloat(document.getElementById("foreXAmount").value);
-    const selectedCurrency = document.getElementById("selectableCurrency").value;
-
-    const data = await fetchApiData();
-    if (!data) {
-        console.error("No data available to convertForexToZig.");
-        return;
-    }
-
-    if (!isNaN(foreXAmount) && foreXAmount > 0) {
-        let conversionRate = (foreXAmount / data.conversion_rates[selectedCurrency]) / zigToUsdConversionRate;
-        document.getElementById("zigAmount").value = conversionRate.toFixed(2);
-    }
-};
-
 const renderChart = async () => {
-    const ctx = document.getElementById("myChart");
+    const ctx = document.getElementById("barChart");
     const data = await fetchApiData();
 
     if (!data) {
@@ -104,11 +116,11 @@ const renderChart = async () => {
 
     const rates = currencies.map(currency => {
         if (currency === "ZiG") {
-            return (usdToZigConversionRate);
+            return usdToZigConversionRate;
         } else if (currency === "ZiG-Low") {
-            return (usdToZigLowestInformalSecConversionRate);
+            return usdToZigLowestInformalSecConversionRate;
         } else if (currency === "ZiG-High") {
-            return (usdToZigHighestInformalSecConversionRate);
+            return usdToZigHighestInformalSecConversionRate;
         }
         else {
             return data.conversion_rates[currency];
@@ -162,7 +174,8 @@ const renderChart = async () => {
 };
 
 const updateDisplayElems = async () => {
-    const selectedCurrency = document.getElementById("selectableCurrency").value;
+    const fromCurrency = document.getElementById("fromCurrency").value;
+    const toCurrency = document.getElementById("toCurrency").value;
 
     const data = await fetchApiData();
     if (!data) {
@@ -173,8 +186,13 @@ const updateDisplayElems = async () => {
     const lastUpdate = data.time_last_update_utc.slice(0, -6);
 
     document.getElementById("text-muted").textContent = `Updated ${lastUpdate}`;
-    document.getElementById("conversionDescription").textContent = `Convert Zimbabwe ZiG to ${selectedCurrency}`;
-    document.getElementById("rateDisplay").textContent = `1 ZiG = ${zigToUsdConversionRate} USD`;
+    document.getElementById("conversionDescription").textContent = `Convert ${fromCurrency} to ${toCurrency}`;
+
+    let fromToUsd = getToUsdRate(fromCurrency) || (1 / data.conversion_rates[fromCurrency]);
+    let toUsd = getUsdRate(toCurrency) || data.conversion_rates[toCurrency];
+    let rate = fromToUsd * toUsd;
+
+    document.getElementById("rateDisplay").textContent = `1 ${fromCurrency} = ${rate.toFixed(4)} ${toCurrency}`;
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -182,32 +200,46 @@ document.addEventListener("DOMContentLoaded", () => {
     updateDisplayElems();
     renderChart();
 
-    const zigAmount = document.getElementById("zigAmount");
-    const foreXAmount = document.getElementById("foreXAmount");
-    const selectableCurrency = document.getElementById("selectableCurrency");
+    const fromAmount = document.getElementById("fromAmount");
+    const toAmount = document.getElementById("toAmount");
+    const fromCurrency = document.getElementById("fromCurrency");
+    const toCurrency = document.getElementById("toCurrency");
 
-    zigAmount.addEventListener("input", () => {
-        foreXAmount.value = "";
-        convertZigToForex();
+    fromAmount.addEventListener("input", () => {
+        toAmount.value = "";
+        convertCurrency("from");
     });
 
-    foreXAmount.addEventListener("input", () => {
-        zigAmount.value = "";
-        convertForexToZig();
+    toAmount.addEventListener("input", () => {
+        fromAmount.value = "";
+        convertCurrency("to");
     });
 
-    selectableCurrency.addEventListener("change", () => {
+    fromCurrency.addEventListener("change", () => {
         updateDisplayElems();
-        if (zigAmount.value) {
-            convertZigToForex();
-        } else if (foreXAmount.value) {
-            convertForexToZig();
+        if (fromAmount.value) {
+            toAmount.value = "";
+            convertCurrency("from");
+        } else if (toAmount.value) {
+            fromAmount.value = "";
+            convertCurrency("to");
+        }
+    });
+
+    toCurrency.addEventListener("change", () => {
+        updateDisplayElems();
+        if (fromAmount.value) {
+            toAmount.value = "";
+            convertCurrency("from");
+        } else if (toAmount.value) {
+            fromAmount.value = "";
+            convertCurrency("to");
         }
     });
 
     const clearButton = document.getElementById("clearButton");
     clearButton.addEventListener("click", () => {
-        document.getElementById("zigAmount").value = "";
-        document.getElementById("foreXAmount").value = "";
+        fromAmount.value = "";
+        toAmount.value = "";
     });
 });

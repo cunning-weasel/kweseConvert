@@ -28,7 +28,7 @@ typedef enum bool
     true
 } bool;
 
-#define PORT 8080
+#define PORT 6969
 #define BUFFER_SIZE 600
 #define PATH_MAX 4096
 

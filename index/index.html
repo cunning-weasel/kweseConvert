@@ -31,14 +31,11 @@
       <div class="card-body">
         <div class="form-group">
           <h3>kweseConvert</h3>
-          <p id="conversionDescription"><!-- Convert Zimbabwe ZiG to USD --></p>
+          <p id="conversionDescription"><!-- convert whatever to whatever --></p>
           <div class="form-group row">
+            <!-- left side-->
             <div class="col">
-              <label for="zigAmount">🇿🇼 ZiG</label> <!-- hardcoded val -->
-              <input type="number" id="zigAmount" class="form-control" placeholder="0">
-            </div>
-            <div class="col">
-              <select id="selectableCurrency" class="form-select border border-0 p-0">
+              <select id="fromCurrency" class="form-select border border-0 p-0">
                 <option value="USD">🇺🇸 USD</option>
                 <option value="ZAR">🇿🇦 ZAR</option>
                 <option value="GBP">🇬🇧 GBP</option>
@@ -49,8 +46,30 @@
                 <option value="ZMW">🇿🇲 ZMW</option>
                 <option value="AUD">🇦🇺 AUD</option>
                 <option value="AED">🇦🇪 AED</option>
+                <option value="ZiG">🇿🇼 ZiG</option>
+                <option value="ZiG-Low">🇿🇼 ZiG-Low</option>
+                <option value="ZiG-High">🇿🇼 ZiG-High</option>
               </select>
-              <input type="number" id="foreXAmount" class="form-control" placeholder="0">
+              <input type="number" id="fromAmount" class="form-control" placeholder="0">
+            </div>
+            <!-- right side-->
+            <div class="col">
+              <select id="toCurrency" class="form-select border border-0 p-0">
+                <option value="USD">🇺🇸 USD</option>
+                <option value="ZAR">🇿🇦 ZAR</option>
+                <option value="GBP">🇬🇧 GBP</option>
+                <option value="BWP">🇧🇼 BWP</option>
+                <option value="EUR">🇪🇺 EUR</option>
+                <option value="NAD">🇳🇦 NAD</option>
+                <option value="MZN">🇲🇿 MZN</option>
+                <option value="ZMW">🇿🇲 ZMW</option>
+                <option value="AUD">🇦🇺 AUD</option>
+                <option value="AED">🇦🇪 AED</option>
+                <option value="ZiG">🇿🇼 ZiG</option>
+                <option value="ZiG-Low">🇿🇼 ZiG-Low</option>
+                <option value="ZiG-High">🇿🇼 ZiG-High</option>
+              </select>
+              <input type="number" id="toAmount" class="form-control" placeholder="0">
             </div>
             <div class="d-grid gap-2">
               <button class="btn btn-outline-light my-3" id="clearButton">Clear</button>
@@ -61,9 +80,9 @@
             <div class="card-body d-flex align-items-center">
               <i class="ti ti-currency-yen fs-2 me-3"></i>
               <div>
-                <div id="rateDisplay"><!-- 1 Ziggy Marley = 0.0727 USD --></div>
+                <div id="rateDisplay"><!-- 1 whatever = whatever --></div>
                 <small id="text-muted" class="text-muted">
-                  <!-- Updated Fri 05 Jul 2024, 7:36:28 AM -->
+                  <!-- Updated whenever -->
                 </small>
               </div>
             </div>
@@ -72,7 +91,7 @@
       </div>
     </div>
     <div class="mt-3">
-      <canvas id="myChart"></canvas>
+      <canvas id="barChart"></canvas>
     </div>
   </div>
 </body>
